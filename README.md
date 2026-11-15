@@ -10,6 +10,8 @@ Elterninitiativen sie nutzen und verbessern können. Mitmachen ist ausdrücklich
 *English in short: a mobile-first parents' app for kindergartens, implemented as a Nextcloud app (PHP backend plus a
 dependency-free JavaScript front end). German UI. AGPL-3.0. Issues and pull requests welcome.*
 
+**[Demo ansehen](https://thecocoashop.github.io/kita-app/)** (mit erfundenen Daten, am besten am Handy oder in einem schmalen Browserfenster).
+
 ## Was sie kann
 
 | Bereich | Inhalt | Nextcloud-Baustein |
