@@ -1,0 +1,5 @@
+.DS_Store
+.testenv/
+nextcloud/build/
+nextcloud/kitaapp.tar.gz
+nextcloud/kitaapp/mail-logo.png

@@ -1,0 +1,115 @@
+// Versionen der KiTa-App mit Neuigkeiten für die Eltern. Neueste zuerst.
+// Bei jedem Update hier oben einen Eintrag ergänzen und die Version in
+// nextcloud/kitaapp/appinfo/info.xml angleichen.
+const RELEASES = [
+  {
+    version: '1.6.2', date: '2026-11-15',
+    notes: [
+      'Im Hintergrund: Das Logo in der Rückblick-Mail wird nur noch eingebunden, wenn es auf dem Server liegt. Für euch ändert sich nichts.',
+    ],
+  },
+  {
+    version: '1.6.1', date: '2026-11-15',
+    notes: [
+      'Im Hintergrund aufgeräumt: Angaben zum Kindergarten (Name, Mailadressen) stehen jetzt in den Einstellungen. Für euch ändert sich nichts.',
+    ],
+  },
+  {
+    version: '1.6.0', date: '2026-11-15',
+    notes: [
+      'Neu: Suche. Oben rechts auf die Lupe tippen und nach einem Wort suchen. Die App durchsucht das Elternhandbuch und die Elternliste.',
+    ],
+  },
+  {
+    version: '1.5.0', date: '2026-11-13',
+    notes: [
+      'Termine: Das Team kann Termine jetzt auch in der App bearbeiten.',
+      'Neu für das Team: „Abwesend“. Die Liste zeigt, welche Kinder heute und in den nächsten Tagen fehlen. Die Eltern melden ihr Kind später selbst in der App (zunächst nur zum Testen für das Team sichtbar).',
+    ],
+  },
+  {
+    version: '1.4.6', date: '2026-11-10',
+    notes: [
+      'Startseite: „Aus dem Tagebuch“ zeigt jetzt immer den neuesten Eintrag, auch wenn er nicht „Wochenrückblick“ heißt (z. B. Herbstferienwoche).',
+    ],
+  },
+  {
+    version: '1.4.5', date: '2026-11-09',
+    notes: [
+      'Die E-Mail zum neuen Wochenrückblick sieht jetzt schöner aus: mit Logo, persönlicher Begrüßung, Auszug und Knopf zum Lesen.',
+      'Wochenrückblick: Aus dem Fotoalbum lässt sich ein Titelbild wählen. Es erscheint im Tagebuch und in der E-Mail.',
+    ],
+  },
+  {
+    version: '1.4.4', date: '2026-11-08',
+    notes: [
+      'Wochenrückblick: „Veröffentlichen“ funktioniert jetzt. Bisher kam die Meldung „Bitte einen Titel eingeben“.',
+    ],
+  },
+  {
+    version: '1.4.3', date: '2026-11-06',
+    notes: [
+      'Meldungen: Der Knopf kann jetzt direkt auf eine Handbuch-Seite zeigen (Auswahl „Handbuch-Seite“). Eingefügte Cloud-Links werden automatisch passend umgewandelt.',
+    ],
+  },
+  {
+    version: '1.4.2', date: '2026-11-06',
+    notes: [
+      'Putzdienst tauschen: „Tauschen“, „Ablehnen“ und „Zurückziehen“ funktionieren jetzt. Bisher kam dabei nur eine Fehlermeldung.',
+    ],
+  },
+  {
+    version: '1.4.1', date: '2026-11-06',
+    notes: [
+      'PDF-Dateien aus dem Handbuch (z. B. Laternenlieder) öffnen sich jetzt auch auf dem iPhone.',
+    ],
+  },
+  {
+    version: '1.4.0', date: '2026-11-06',
+    notes: [
+      'Vorstand und Team können Termine jetzt direkt in der App ändern: bei dem Termin auf den Stift ✏️ tippen.',
+      'Der Waldaktionstag beginnt um 10 Uhr.',
+    ],
+  },
+  {
+    version: '1.3.1', date: '2026-11-05',
+    notes: [
+      'Einheitliche Namen: Die App auf dem Handy heißt „KiTa-App“, die Cloud im Browser „KitaCloud“.',
+    ],
+  },
+  {
+    version: '1.3.0', date: '2026-11-05',
+    notes: [
+      'Umfragen: Wo es erlaubt ist, könnt ihr jetzt eigene Antworten vorschlagen.',
+      'Wer eine Umfrage anlegt, kann das mit einem Haken an- oder ausschalten.',
+    ],
+  },
+  {
+    version: '1.2.0', date: '2026-11-04',
+    notes: [
+      'Termine: Die Monatsansicht gibt es jetzt für alle.',
+      'Neu: Versionsnummer und diese Übersicht „Was ist neu?“.',
+      'Im Handbuch ist die Seite „Willkommen in der KitaCloud“ überarbeitet und beschreibt jetzt die KiTa-App.',
+      'Das Team schreibt den Wochenrückblick jetzt direkt in der App.',
+    ],
+  },
+  {
+    version: '1.1.0', date: '2026-11-03',
+    notes: [
+      'Termine: Ein Tipp auf einen Termin zeigt die Beschreibung und den Ort.',
+      'Termine, die mehrfach im Kalender stehen, erscheinen nur noch einmal.',
+      'Chat: Gelesene Unterhaltungen verlieren ihre Zahl wieder.',
+      'Kontakte: Telefonnummern und E-Mail-Adressen zeigen, zu welchem Elternteil sie gehören.',
+      'Wer Putzdienst hat, sieht auf der Startseite die Karte „Euer Putzdienst“ mit Aufgabenliste und Checkliste.',
+    ],
+  },
+  {
+    version: '1.0.0', date: '2026-11-01',
+    notes: [
+      'Start der KiTa-App für alle Eltern: Termine, Chat, Kontakte, Umfragen, Handbuch.',
+      'Putzdienst tauschen: Anfrage an die andere Familie, der Kalender passt sich automatisch an.',
+      'Meldungen vom Vorstand erscheinen oben auf der Startseite.',
+    ],
+  },
+];
+const APP_VERSION = RELEASES[0].version;
