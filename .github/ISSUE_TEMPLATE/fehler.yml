@@ -1,0 +1,43 @@
+name: Fehler melden
+description: Etwas funktioniert nicht wie erwartet
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Bitte keine echten Namen, Kinderdaten, Mailadressen, Zugangsdaten oder Screenshots mit echten Personen.**
+        Ersetzt sie durch erfundene Angaben („Familie Muster“).
+  - type: textarea
+    id: was
+    attributes:
+      label: Was ist passiert?
+      description: Was habt ihr gemacht, was habt ihr erwartet, was ist stattdessen passiert?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version der KiTa-App
+      description: Steht im Handbuch ganz unten, z. B. 1.6.2
+  - type: input
+    id: nextcloud
+    attributes:
+      label: Nextcloud-Version
+      description: Zu finden unter Einstellungen, Verwaltung, Übersicht
+  - type: input
+    id: geraet
+    attributes:
+      label: Gerät und Browser
+      description: z. B. iPhone, Safari oder Android, Chrome (als Homescreen-App installiert?)
+  - type: textarea
+    id: meldung
+    attributes:
+      label: Fehlermeldung
+      description: Falls die App oder der Server eine Meldung zeigt. Bitte vorher persönliche Angaben entfernen.
+  - type: checkboxes
+    id: daten
+    attributes:
+      label: Datenschutz
+      options:
+        - label: Ich habe keine echten Namen, Kinderdaten oder Zugangsdaten eingefügt.
+          required: true

@@ -1,0 +1,26 @@
+name: Wunsch oder Idee
+description: Eine neue Funktion oder Verbesserung vorschlagen
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Die App soll klein und einfach bleiben. Erzählt, was ihr im Alltag braucht, bevor ihr eine Lösung beschreibt.
+        **Bitte keine echten Namen oder Kinderdaten.**
+  - type: textarea
+    id: problem
+    attributes:
+      label: Was fehlt euch im Alltag?
+      description: Welche Situation, wer ist beteiligt (Eltern, Team, Vorstand)?
+    validations:
+      required: true
+  - type: textarea
+    id: idee
+    attributes:
+      label: Wie könnte es aussehen?
+      description: Optional. Ein Satz oder eine Skizze genügt.
+  - type: textarea
+    id: einrichtung
+    attributes:
+      label: Eure Einrichtung
+      description: Optional. Größe, Gruppen, was ihr heute nutzt. Hilft einzuschätzen, ob es auch für andere passt.
