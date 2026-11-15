@@ -1381,7 +1381,16 @@ async function viewSuche() {
   let pages = null;
   let contacts = [];
   loadContacts().then((c) => { contacts = c; run(); }).catch(() => {});
-  api.searchPages().then((p) => { pages = p.map((x) => ({ ...x, text: plainText(x.body), f: fold(x.title + ' ' + plainText(x.body)) })); run(); }).catch(() => { pages = []; run(); });
+  api.searchPages().then((p) => {
+    pages = p.map((x) => {
+      // Der Seitentitel steht oft als erste Zeile im Text, im Ausschnitt nicht wiederholen
+      let text = plainText(x.body);
+      const leaf = x.title.split(' › ').pop();
+      if (text.toLowerCase().startsWith(leaf.toLowerCase())) text = text.slice(leaf.length).trim();
+      return { ...x, text, f: fold(x.title + ' ' + text) };
+    });
+    run();
+  }).catch(() => { pages = []; run(); });
   let timer = null;
   input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(run, 120); });
 

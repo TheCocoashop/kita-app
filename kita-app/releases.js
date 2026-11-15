@@ -3,6 +3,12 @@
 // nextcloud/kitaapp/appinfo/info.xml angleichen.
 const RELEASES = [
   {
+    version: '1.6.3', date: '2026-11-15',
+    notes: [
+      'Suche: Das gesuchte Wort ist in den Treffern jetzt deutlicher markiert, und der Seitentitel wird im Ausschnitt nicht mehr wiederholt.',
+    ],
+  },
+  {
     version: '1.6.2', date: '2026-11-15',
     notes: [
       'Im Hintergrund: Das Logo in der Rückblick-Mail wird nur noch eingebunden, wenn es auf dem Server liegt. Für euch ändert sich nichts.',
