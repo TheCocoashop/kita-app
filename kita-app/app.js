@@ -1350,12 +1350,8 @@ function plainText(md) {
     .trim();
 }
 
-function snippet(text, terms) {
-  const f = fold(text);
-  const at = terms.map((t) => f.indexOf(t)).filter((i) => i >= 0).sort((a, b) => a - b)[0] ?? 0;
-  const from = Math.max(0, at - 40);
-  const part = text.slice(from, from + 130);
-  // Treffer markieren; nur wenn die Faltung die Länge nicht ändert (sonst ohne Markierung)
+// Treffer in einem Text markieren (nur wenn die Faltung die Länge nicht ändert, sonst ohne Markierung)
+function markHtml(part, terms) {
   const fp = fold(part);
   const marks = new Array(part.length).fill(false);
   if (fp.length === part.length) {
@@ -1368,7 +1364,15 @@ function snippet(text, terms) {
     out += marks[i] ? `<mark>${esc(part.slice(i, j))}</mark>` : esc(part.slice(i, j));
     i = j;
   }
-  return (from > 0 ? '… ' : '') + out + (from + 130 < text.length ? ' …' : '');
+  return out;
+}
+
+function snippet(text, terms) {
+  const f = fold(text);
+  const at = terms.map((t) => f.indexOf(t)).filter((i) => i >= 0).sort((a, b) => a - b)[0] ?? 0;
+  const from = Math.max(0, at - 40);
+  const part = text.slice(from, from + 130);
+  return (from > 0 ? '… ' : '') + markHtml(part, terms) + (from + 130 < text.length ? ' …' : '');
 }
 
 async function viewSuche() {
@@ -1410,7 +1414,7 @@ async function viewSuche() {
       <h2 class="section">Handbuch</h2>
       ${pages === null ? '<p class="meta">Wird durchsucht …</p>' : hitsPages.length ? `<div class="list">${hitsPages.map(({ p }) => `
         <a class="row" href="#/handbuch/${encodeURIComponent(p.id)}">
-          <div class="grow"><div class="title">${esc(p.title)}</div><div class="meta">${snippet(p.text, terms)}</div></div>
+          <div class="grow"><div class="title">${markHtml(p.title, terms)}</div><div class="meta">${snippet(p.text, terms)}</div></div>
           <span class="chev">›</span></a>`).join('')}</div>` : '<p class="meta">Nichts gefunden.</p>'}
       <h2 class="section">Elternliste</h2>
       ${hitsContacts.length ? `<div class="list">${hitsContacts.map((c) => `

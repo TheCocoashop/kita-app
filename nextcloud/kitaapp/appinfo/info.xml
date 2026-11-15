@@ -5,7 +5,7 @@
     <name>KiTa-App</name>
     <summary>Handyfreundliche Elternansicht für Termine, Chat, Umfragen und Handbuch</summary>
     <description>Eine schlanke Oberfläche für Eltern auf dem Handy. Zeigt Kalender, Talk-Chats, Umfragen (Polls) und das Elternhandbuch (Collectives) der KitaCloud und verlinkt auf KitaFotos.</description>
-    <version>1.6.3</version>
+    <version>1.6.4</version>
     <licence>agpl</licence>
     <author>Naturkindergarten Dießen e.V.</author>
     <namespace>KitaApp</namespace>
