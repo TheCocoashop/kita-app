@@ -4,8 +4,9 @@ A mobile-first parents' app for kindergartens and parent-run childcare initiativ
 [Nextcloud](https://nextcloud.com/) app. It gives parents what they need every day in one lean interface for the
 smartphone, and it installs on the home screen like an app (PWA, no app store).
 
-It grew out of a parent-run forest kindergarten in Bavaria and is released under the AGPL-3.0 so that other
-initiatives can use and improve it. Contributions are very welcome.
+It grew out of a parent-run forest kindergarten in Bavaria. The idea: reduce the dependence on proprietary messengers
+and apps (the WhatsApp dilemma) and keep the data on servers you control or in the EU (GDPR). It is released under the
+AGPL-3.0 so that other initiatives can use and improve it. Contributions are very welcome.
 
 **[Try the live demo](https://thecocoashop.github.io/kita-app/)** (made-up data). On a computer the app is shown inside a phone frame, on a phone without.
 
