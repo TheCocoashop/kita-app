@@ -66,6 +66,10 @@ occ app:enable kitaapp                        # dann für alle
 Angaben zur Einrichtung (Name, Absender, Kontaktadressen, Foto-Adresse) stehen in den App-Einstellungen, nicht im Code.
 Die Namen der Gruppen (Vorstand, Team, Eltern) und der Kalender lassen sich ebenfalls einstellen.
 
+## Raus aus WhatsApp: unsere Erfahrungen
+
+Wie wir den Umstieg angehen, welche Hürden es gibt und was uns hilft, steht im [Erfahrungsbericht](docs/umstieg.md). Für Vereine, die über denselben Schritt nachdenken.
+
 ## Datenschutz
 
 - Die Abwesenheitsmeldung speichert nur Vorname, Zeitraum und Art (krank, Urlaub, sonstiges), ohne Freitext und ohne Diagnose.
