@@ -4,6 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>KiTa-App</title>
+  <script>
+    // Demo am Computer: in einem Handyrahmen zeigen (phone.html). Am Handy und mit ?plain ohne Rahmen.
+    if (window.top === window && !/[?&]plain\b/.test(location.search)
+        && matchMedia('(min-width: 700px) and (pointer: fine)').matches) {
+      location.replace('phone.html' + location.hash);
+    }
+  </script>
   <meta name="theme-color" content="#2F5B40">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">

@@ -17,7 +17,7 @@ dependency-free JavaScript front end). German UI. AGPL-3.0. Issues and pull requ
 
 **English:** [README.en.md](README.en.md)
 
-**[Demo ansehen](https://thecocoashop.github.io/kita-app/)** (mit erfundenen Daten, am besten am Handy oder in einem schmalen Browserfenster).
+**[Demo ansehen](https://thecocoashop.github.io/kita-app/)** (mit erfundenen Daten). Am Computer erscheint die App in einem Handyrahmen, am Handy ohne.
 
 <p align="center">
   <img src="docs/screenshots/start.png" alt="Startseite" width="23%">

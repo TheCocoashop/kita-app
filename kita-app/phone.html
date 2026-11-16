@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KiTa-App Demo</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <style>
+    :root {
+      --bg: #E9EDE6; --ink: #1E2B22; --soft: #55604F; --green: #2F5B40; --frame: #1B241E; --shadow: rgba(30, 43, 34, .28);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #0F1511; --ink: #E7EDE4; --soft: #A5B0A0; --green: #7FC79B; --frame: #2A352D; --shadow: rgba(0, 0, 0, .55); }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
+      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      display: flex; align-items: center; justify-content: center; gap: clamp(32px, 8vw, 120px);
+      padding: 24px;
+    }
+    .intro { max-width: 340px; }
+    .intro h1 { margin: 0 0 8px; font-size: 28px; line-height: 1.2; }
+    .intro p { margin: 0 0 14px; color: var(--soft); }
+    .intro a { color: var(--green); font-weight: 600; }
+    .phone {
+      flex: none; width: 396px; height: min(844px, calc(100vh - 48px));
+      border: 12px solid var(--frame); border-radius: 48px; overflow: hidden;
+      box-shadow: 0 24px 60px var(--shadow); background: #000;
+    }
+    .phone iframe { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
+    @media (max-width: 899px) { .intro { display: none; } }
+  </style>
+</head>
+<body>
+  <section class="intro">
+    <h1>KiTa-App</h1>
+    <p>Die Eltern-App für Kindergärten auf Basis von Nextcloud. Das ist eine Demo mit erfundenen Daten, ihr könnt alles anklicken.</p>
+    <p>Am Handy öffnet sich die App ohne Rahmen. Hier am Computer zeigt der Rahmen, wie sie dort aussieht.</p>
+    <p><a href="index.html?plain">Ohne Rahmen ansehen</a><br>
+       <a href="https://github.com/TheCocoashop/kita-app">Quellcode auf GitHub</a></p>
+  </section>
+  <div class="phone">
+    <iframe id="app" title="KiTa-App Demo" src="index.html?frame=1"></iframe>
+  </div>
+  <script>
+    // Seite innerhalb des Rahmens wie bei der Adresse der Seite öffnen (z. B. phone.html#/termine)
+    if (location.hash) document.getElementById('app').src = 'index.html?frame=1' + location.hash;
+  </script>
+</body>
+</html>

@@ -7,7 +7,7 @@ smartphone, and it installs on the home screen like an app (PWA, no app store).
 It grew out of a parent-run forest kindergarten in Bavaria and is released under the AGPL-3.0 so that other
 initiatives can use and improve it. Contributions are very welcome.
 
-**[Try the live demo](https://thecocoashop.github.io/kita-app/)** (made-up data; best on a phone or in a narrow browser window).
+**[Try the live demo](https://thecocoashop.github.io/kita-app/)** (made-up data). On a computer the app is shown inside a phone frame, on a phone without.
 
 <p align="center">
   <img src="docs/screenshots/start.png" alt="Start page" width="23%">
