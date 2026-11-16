@@ -26,6 +26,36 @@ Die Kosten sind gering. Neben der Zeit ist der Serverbetrieb der einzige Posten,
 Dafür bekommen wir nicht nur die Cloud, sondern auch den Mailserver, die Vereinswebseite und eine Alternative zu
 Microsoft 365 (die Nextcloud selbst). Die Software ist frei, es gibt keine Lizenzgebühren. Das Meiste ist Zeit.
 
+## Das Elternhandbuch: Mitarbeit koordinieren
+
+In einer Elterninitiative arbeiten die Eltern mit, und das will koordiniert sein. Wer macht was, bis wann, und wo steht
+das? Im Chat geht das verloren, jedes neue Kindergartenjahr beginnt wieder bei null. Deshalb ist das Elternhandbuch
+(eine Collectives-Seitensammlung in der Nextcloud) bei uns der feste Ort für alles, was Eltern wissen müssen.
+
+Was dort stehen kann, je nach Kindergarten (die Aufzählung ist ein Vorschlag, kein Muss):
+
+- **Dienste und ihre Aufteilung:** Was gehört zu welchem Dienst (zum Beispiel Putzdienst, Einkauf, Wäsche, Gartendienst),
+  wie oft ist eine Familie dran, wer vertritt wen, und wie tauscht man.
+- **Putzdienst im Detail:** Was gehört dazu, welche Räume, welche Mittel, und eine Checkliste zum Abhaken. Gerade hier
+  entstehen sonst Missverständnisse und Ärger.
+- **Aktionstage und Feste:** Wann sie stattfinden, wie viele Hände gebraucht werden, wer was mitbringt oder vorbereitet
+  (Arbeitseinsatz, Sommerfest, Laternenumzug).
+- **Gesundheit:** Was tun bei Infektionen und anderen Krankheiten, wann darf das Kind wieder kommen, wen informiert man,
+  und wie geht man mit Meldungen um.
+- **Sauberkeit und Hygiene** im Alltag, zum Beispiel Händewaschen, Kleidung und Wechselsachen.
+- **Organisatorisches:** Öffnungs- und Schließzeiten, Ansprechpersonen, Abholregeln, Elternabende, Verein und Vorstand.
+- **Neue Eltern:** Eine Seite „Wir sind neu, was nun?“ ersetzt viele Einzelfragen und die Vorgeschichte aus dem Chat.
+
+Ein paar Erfahrungen dazu:
+
+- **Eine Seite pro Thema, kurz und mit Überschriften.** Eltern lesen am Handy und suchen etwas Bestimmtes. Die Suche in der
+  App findet die Seiten.
+- **Verbindlich ist, was im Handbuch steht.** Fragt jemand im Chat, antworten wir mit dem Link. So wächst das Handbuch mit.
+- **Pflege verteilen.** Jeder Dienst hat eine Person, die „ihre“ Seite aktuell hält. Sonst hängt es an einer Person.
+- **Zum Jahreswechsel durchsehen.** Zum neuen Kindergartenjahr einmal alles prüfen: Termine, Zuständigkeiten, Namen.
+
+Das Handbuch wirkt unscheinbar, ist aber der Teil, den Eltern bei uns am deutlichsten gelobt haben.
+
 ## Wie wir vorgegangen sind
 
 1. **Erst den Vorstand und das Team gewinnen.** Ohne den Vorstand geht es nicht. Er entscheidet, was „offiziell“ gilt,
@@ -54,19 +84,19 @@ Das sind genau die Dinge, die ein Chat nicht leistet. Sie überzeugen mehr als j
   Homescreen ist.
 - **Eltern im letzten Kindergartenjahr stellen sich quer.** Bei uns sind es zwei Elternteile. Ihre Haltung ist verständlich:
   Sie haben nur noch ein Jahr und sehen den Nutzen nicht. Deshalb läuft WhatsApp vorerst weiter, wir zwingen niemanden.
-- **Wenig Rückmeldung, und viel Nachfragen.** Egal, wie oft wir darum gebeten haben und obwohl wir es am Elternabend
-  vorgestellt haben: Es kam kaum Resonanz. Das Frustrierendste ist, Eltern die Kritik und sogar die einfache Auskunft
-  „Hast du schon einmal hineingeschaut?“ aus der Nase ziehen zu müssen. Wer nichts sagt, hat nicht unbedingt kein Problem.
-- **Kommunikation ist das Wichtigste, und trotzdem fühlen sich einige übergangen.** Manche fühlen sich überfordert oder
+- **Wenig Rückmeldung, und viel Nachfragen.** Wir haben mehrfach um Rückmeldung gebeten und die App am Elternabend
+  vorgestellt, trotzdem kam wenig Resonanz. Frustrierend ist, Kritik und sogar die einfache Auskunft
+  „Hast du schon einmal hineingeschaut?“ immer wieder einfordern zu müssen. Wer nichts sagt, hat nicht unbedingt kein Problem.
+- **Kommunikation ist das Wichtigste, und trotzdem fühlen sich einige übergangen.** Manche fühlen sich vielleicht überfordert oder
   nicht persönlich gefragt, obwohl wir es am Elternabend und im Chat angesprochen haben. Das ist wohl keine Ausnahme, sondern
   normales Menschliches, wenn so unterschiedliche Gruppen zusammenkommen. Es hilft, einzelne Eltern direkt zu fragen, statt
   nur an alle zu schreiben.
-- **Fehler und Bedienung.** Wenn etwas nicht gleich funktioniert, ist die Geduld schnell weg. Wir hören immer wieder,
+- **Fehler und Bedienung.** Wenn etwas nicht gleich funktioniert, ist die Geduld schnell weg. Gelegentlich hören wir,
   es sei zu kompliziert. Jeder Fehler kostet Vertrauen, das man nur langsam zurückgewinnt.
 - **„Es ging bisher auch ohne.“** Das stimmt, und es lässt sich nicht widerlegen. Es hilft nur, wenn die neue Lösung im
   Alltag spürbar etwas einfacher macht als die alte.
 
-## Was uns geholfen hat und was wir empfehlen
+## Was geholfen hat und was wir empfehlen
 
 - **Den Vorstand überzeugen, nicht die Eltern.** Wenn der Vorstand klar sagt, wo etwas verbindlich steht, folgen die Eltern.
   Argumente, die beim Vorstand gezogen haben: Datenschutz, Kosten (niedrig) und dass die Verwaltung auch ohne Spezialwissen
@@ -84,7 +114,7 @@ Das sind genau die Dinge, die ein Chat nicht leistet. Sie überzeugen mehr als j
 
 Das ist die Erfahrung von Michael, der die Technik betreut. Rückblickend würde ich zwei Dinge früher tun:
 
-- **Den Vorstand vorab informieren, auch bei kleinen Schritten.** Nicht nur über das Große, sondern auch über grobe
+- **Den Vorstand noch gezielter vorab informieren, auch bei kleinen Schritten.** Nicht nur über das Große, sondern auch über grobe
   Anpassungen und neue Zusatzfunktionen („Plugins“). Das verhindert, dass der Vorstand etwas zum ersten Mal von den
   Eltern hört, und er kann den Umstieg glaubwürdig mittragen.
 - **Zwei Elternpaare (oder auch nur Elternteile) als Verbündete gewinnen.** Am besten die engagiertesten Eltern, die keine
