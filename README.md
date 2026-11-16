@@ -4,8 +4,13 @@ Eine handyfreundliche Eltern-App für Kindergärten und Elterninitiativen, gebau
 [Nextcloud](https://nextcloud.com/). Sie zeigt, was Eltern täglich brauchen, in einer schlichten Oberfläche
 für das Smartphone, und lässt sich wie eine App auf dem Homescreen installieren (PWA, kein App-Store).
 
-Entstanden im Naturkindergarten Dießen e.V., einer Elterninitiative. Freigegeben unter AGPL-3.0, damit auch andere
-Elterninitiativen sie nutzen und verbessern können. Mitmachen ist ausdrücklich erwünscht.
+Entstanden im Naturkindergarten Dießen e.V., einer Elterninitiative. 
+Die Idee dahinter war, die Abhängigkeiten von proprietären Systemen/Apps zu reduzieren und auch 
+das Whatsapp Dilemma auszubremsen (DSGVO). Öffentlichen Trägern ist es nicht gestattet 
+Whatsapp zu nutzen (Urheberhaftung), des weiteren landen die Daten hiermit bestenfalls 
+auf eigenen oder in der EU gehosteten Servern.
+Freigegeben unter AGPL-3.0, damit auch andere Elterninitiativen sie nutzen und verbessern können. 
+Mitmachen ist ausdrücklich erwünscht.
 
 *English in short: a mobile-first parents' app for kindergartens, implemented as a Nextcloud app (PHP backend plus a
 dependency-free JavaScript front end). German UI. AGPL-3.0. Issues and pull requests welcome.*
