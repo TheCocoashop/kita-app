@@ -14,6 +14,13 @@ dependency-free JavaScript front end). German UI. AGPL-3.0. Issues and pull requ
 
 **[Demo ansehen](https://thecocoashop.github.io/kita-app/)** (mit erfundenen Daten, am besten am Handy oder in einem schmalen Browserfenster).
 
+<p align="center">
+  <img src="docs/screenshots/start.png" alt="Startseite" width="23%">
+  <img src="docs/screenshots/termine.png" alt="Termine" width="23%">
+  <img src="docs/screenshots/tagebuch.png" alt="Handbuch: Kindergartentagebuch" width="23%">
+  <img src="docs/screenshots/suche.png" alt="Suche" width="23%">
+</p>
+
 ## Was sie kann
 
 | Bereich | Inhalt | Nextcloud-Baustein |

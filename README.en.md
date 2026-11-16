@@ -9,6 +9,13 @@ initiatives can use and improve it. Contributions are very welcome.
 
 **[Try the live demo](https://thecocoashop.github.io/kita-app/)** (made-up data; best on a phone or in a narrow browser window).
 
+<p align="center">
+  <img src="docs/screenshots/start.png" alt="Start page" width="23%">
+  <img src="docs/screenshots/termine.png" alt="Events" width="23%">
+  <img src="docs/screenshots/tagebuch.png" alt="Handbook: kindergarten diary" width="23%">
+  <img src="docs/screenshots/suche.png" alt="Search" width="23%">
+</p>
+
 > The user interface is **German** only for now. Translations would be a great first contribution.
 > Deutsche Fassung: [README.md](README.md)
 
