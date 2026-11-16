@@ -75,9 +75,22 @@ Das sind genau die Dinge, die ein Chat nicht leistet. Sie überzeugen mehr als j
   die Zustimmung.
 - **Einfach zu verwalten.** Eine Lösung, die nur eine Person versteht, ist ein Risiko. Es sollte dokumentiert sein, wie
   alles eingerichtet ist, damit sie ein zweiter Mensch übernehmen kann.
+- **Verbündete unter den Eltern.** Zwei engagierte Elternpaare, die früh mitmachen und andere überzeugen (siehe unten).
 - **Kleine Schritte.** Nicht alles auf einmal. Jede Neuerung einzeln einführen, erklären und erst dann die nächste.
 - **Kurze Anleitungen mit Bildern**, wenige Sätze pro Schritt, auch für die iPhone- und Android-Variante.
 - **Nachfragen statt warten.** Gezielt einzelne Eltern persönlich fragen, was nicht klappt. Das bringt mehr als eine allgemeine Bitte an alle.
+
+## Was ich beim nächsten Mal anders machen würde
+
+Das ist die Erfahrung von Michael, der die Technik betreut. Rückblickend würde ich zwei Dinge früher tun:
+
+- **Den Vorstand vorab informieren, auch bei kleinen Schritten.** Nicht nur über das Große, sondern auch über grobe
+  Anpassungen und neue Zusatzfunktionen („Plugins“). Das verhindert, dass der Vorstand etwas zum ersten Mal von den
+  Eltern hört, und er kann den Umstieg glaubwürdig mittragen.
+- **Zwei Elternpaare (oder auch nur Elternteile) als Verbündete gewinnen.** Am besten die engagiertesten Eltern, die keine
+  Berührungsängste mit solchen Dingen haben und sich selbst als Betroffene sehen. Sie probieren neue Funktionen vor den
+  anderen aus, sagen offen, was holpert, und überzeugen andere Eltern leichter, als es jemand aus der Technik kann. Es ist
+  etwas anderes, ob „der IT-Mensch“ sagt, dass es einfach ist, oder ob es eine andere Mutter oder ein anderer Vater sagt.
 
 ## Was wir noch nicht wissen
 
