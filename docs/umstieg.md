@@ -22,7 +22,9 @@ Umfragen, ein Elternhandbuch (Collectives), die Elternliste, Fotos und weitere D
 umständlich ist, haben wir dazu die KiTa-App gebaut, eine schlichte Oberfläche, die man wie eine App auf den Homescreen
 legt. Die Daten bleiben dabei auf dem eigenen Server.
 
-Die Kosten waren gering: ein kleiner Server und freie Software, keine Lizenzgebühren. Das Meiste war Zeit.
+Die Kosten sind gering. Neben der Zeit ist der Serverbetrieb der einzige Posten, und der liegt bei etwa 20 Euro im Monat.
+Dafür bekommen wir nicht nur die Cloud, sondern auch den Mailserver, die Vereinswebseite und eine Alternative zu
+Microsoft 365 (die Nextcloud selbst). Die Software ist frei, es gibt keine Lizenzgebühren. Das Meiste ist Zeit.
 
 ## Wie wir vorgegangen sind
 
@@ -36,6 +38,15 @@ Die Kosten waren gering: ein kleiner Server und freie Software, keine Lizenzgeb�
 5. **WhatsApp läuft parallel weiter**, bis der Umstieg zum neuen Kindergartenjahr stattfindet. Der vollständige Wechsel ist
    für August 2027 geplant. Wir erwarten, dass er nicht früher abgeschlossen ist.
 
+## Was gut läuft
+
+- **Der Putzdienst-Tausch.** Familien tauschen ihre Dienste selbst in der App, der Kalender passt sich an. Das klappt gut,
+  und dafür gab es Lob. Vorher lief das über Nachrichten in der Gruppe und über Rückfragen beim Vorstand.
+- **Alles an einem Platz.** Termine, Handbuch und die Elternliste mit den Adressen stehen an einer Stelle und gehen nicht
+  mehr im Chat unter. Gerade die Elternadressen und das Handbuch haben Eltern ausdrücklich gelobt.
+
+Das sind genau die Dinge, die ein Chat nicht leistet. Sie überzeugen mehr als jedes Argument zum Datenschutz.
+
 ## Die Hürden, ehrlich
 
 - **„Noch eine App auf dem Handy.“** Die Skepsis ist groß. Schon der Umstieg von WhatsApp auf Signal hat in unserer Gruppe
@@ -43,9 +54,13 @@ Die Kosten waren gering: ein kleiner Server und freie Software, keine Lizenzgeb�
   Homescreen ist.
 - **Eltern im letzten Kindergartenjahr stellen sich quer.** Bei uns sind es zwei Elternteile. Ihre Haltung ist verständlich:
   Sie haben nur noch ein Jahr und sehen den Nutzen nicht. Deshalb läuft WhatsApp vorerst weiter, wir zwingen niemanden.
-- **Wenig Rückmeldung.** Egal, wie oft wir darum gebeten haben und obwohl wir es am Elternabend vorgestellt haben: Es kam
-  kaum Resonanz. Wer nichts sagt, hat nicht unbedingt kein Problem. Wir mussten aktiv nachfragen und einzelne Eltern direkt
-  ansprechen.
+- **Wenig Rückmeldung, und viel Nachfragen.** Egal, wie oft wir darum gebeten haben und obwohl wir es am Elternabend
+  vorgestellt haben: Es kam kaum Resonanz. Das Frustrierendste ist, Eltern die Kritik und sogar die einfache Auskunft
+  „Hast du schon einmal hineingeschaut?“ aus der Nase ziehen zu müssen. Wer nichts sagt, hat nicht unbedingt kein Problem.
+- **Kommunikation ist das Wichtigste, und trotzdem fühlen sich einige übergangen.** Manche fühlen sich überfordert oder
+  nicht persönlich gefragt, obwohl wir es am Elternabend und im Chat angesprochen haben. Das ist wohl keine Ausnahme, sondern
+  normales Menschliches, wenn so unterschiedliche Gruppen zusammenkommen. Es hilft, einzelne Eltern direkt zu fragen, statt
+  nur an alle zu schreiben.
 - **Fehler und Bedienung.** Wenn etwas nicht gleich funktioniert, ist die Geduld schnell weg. Wir hören immer wieder,
   es sei zu kompliziert. Jeder Fehler kostet Vertrauen, das man nur langsam zurückgewinnt.
 - **„Es ging bisher auch ohne.“** Das stimmt, und es lässt sich nicht widerlegen. Es hilft nur, wenn die neue Lösung im
@@ -62,7 +77,7 @@ Die Kosten waren gering: ein kleiner Server und freie Software, keine Lizenzgeb�
   alles eingerichtet ist, damit sie ein zweiter Mensch übernehmen kann.
 - **Kleine Schritte.** Nicht alles auf einmal. Jede Neuerung einzeln einführen, erklären und erst dann die nächste.
 - **Kurze Anleitungen mit Bildern**, wenige Sätze pro Schritt, auch für die iPhone- und Android-Variante.
-- **Nachfragen statt warten.** Gezielt einzelne Eltern fragen, was nicht klappt. Das bringt mehr als eine allgemeine Bitte.
+- **Nachfragen statt warten.** Gezielt einzelne Eltern persönlich fragen, was nicht klappt. Das bringt mehr als eine allgemeine Bitte an alle.
 
 ## Was wir noch nicht wissen
 
