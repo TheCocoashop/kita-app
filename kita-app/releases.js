@@ -3,6 +3,12 @@
 // nextcloud/kitaapp/appinfo/info.xml angleichen.
 const RELEASES = [
   {
+    version: '1.7.1', date: '2026-11-19',
+    notes: [
+      'Chat: Auf Nachrichten kann jetzt mit Emojis reagiert werden. Auf „＋☺“ unter der Nachricht tippen und ein Emoji wählen. Ein Emoji, das schon da ist, tippt man an, um sich anzuschließen oder die eigene Reaktion zurückzunehmen. Die Reaktionen sind auch in der Nextcloud (Talk) zu sehen.',
+    ],
+  },
+  {
     version: '1.7.0', date: '2026-11-19',
     notes: [
       'Abwesend: Die Auswahl (krank, Urlaub, Arzttermin, sonstiges) ist jetzt deutlich markiert.',

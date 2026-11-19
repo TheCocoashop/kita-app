@@ -983,7 +983,9 @@ async function viewChat(token) {
     </form>`);
 
   const $msgs = document.getElementById('msgs');
+  let state = c.messages;
   const redraw = (messages) => {
+    state = messages;
     const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 80;
     $msgs.innerHTML = messagesHtml(messages);
     if (atBottom) window.scrollTo(0, document.body.scrollHeight);
@@ -1004,12 +1006,51 @@ async function viewChat(token) {
     }
   });
 
+  // Emoji-Reaktionen: Chip antippen = selbst reagieren oder zurücknehmen, „＋☺“ = Auswahl öffnen
+  const toggleReaction = async (id, emoji) => {
+    const m = state.find((x) => x.id === id);
+    if (!m) return;
+    const on = !m.mine.includes(emoji);
+    // sofort zeigen, danach mit dem Stand des Servers abgleichen
+    const reactions = { ...m.reactions, [emoji]: Math.max(0, (m.reactions[emoji] || 0) + (on ? 1 : -1)) };
+    if (!reactions[emoji]) delete reactions[emoji];
+    redraw(state.map((x) => x.id === id ? { ...x, reactions, mine: on ? [...x.mine, emoji] : x.mine.filter((e) => e !== emoji) } : x));
+    try { redraw(await api.react(token, id, emoji, on)); } catch (e) {
+      alert('Die Reaktion konnte nicht gespeichert werden.');
+      try { redraw((await api.chat(token)).messages); } catch {}
+    }
+  };
+  $msgs.addEventListener('click', (ev) => {
+    const b = ev.target.closest('button[data-id]');
+    if (!b) return;
+    const id = Number(b.dataset.id);
+    if (b.dataset.emoji) return toggleReaction(id, b.dataset.emoji);
+    // „＋☺“: Auswahl unter der Nachricht ein- oder ausblenden
+    const msg = b.closest('.msg');
+    const open = msg.querySelector('.picker');
+    $msgs.querySelectorAll('.picker').forEach((p) => p.remove());
+    if (open) return;
+    const picker = document.createElement('div');
+    picker.className = 'picker';
+    picker.innerHTML = REACTIONS.map((e) => `<button type="button" data-id="${id}" data-emoji="${e}" aria-label="Mit ${e} reagieren">${e}</button>`).join('');
+    msg.querySelector('.reacts').after(picker);
+  });
+
   if (!api.demo) {
     refreshTimer = setInterval(async () => {
-      if (document.hidden) return;
+      if (document.hidden || $msgs.querySelector('.picker')) return;
       try { redraw((await api.chat(token)).messages); } catch (e) { /* nächster Versuch */ }
     }, 10000);
   }
+}
+
+const REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🎉'];
+
+function reactionsHtml(m) {
+  if (m.id === undefined) return '';
+  const chips = Object.entries(m.reactions || {}).map(([e, n]) =>
+    `<button type="button" class="react${(m.mine || []).includes(e) ? ' mine' : ''}" data-id="${m.id}" data-emoji="${e}">${e} ${n}</button>`).join('');
+  return `<div class="reacts">${chips}<button type="button" class="react add" data-id="${m.id}" aria-label="Mit Emoji reagieren">＋☺</button></div>`;
 }
 
 function messagesHtml(msgs) {
@@ -1021,6 +1062,7 @@ function messagesHtml(msgs) {
     return `${sep}<div class="msg${m.me ? ' me' : ''}">
       ${m.me ? '' : `<div class="who">${esc(m.who)}</div>`}
       <div class="body">${/[#*`|]|^\s*[-*]\s/m.test(m.text) ? markdown(m.text) : linkify(esc(m.text)).replace(/\n/g, '<br>')}</div>
+      ${reactionsHtml(m)}
       <div class="time">${fmtTime(m.t)}</div>
     </div>`;
   }).join('');

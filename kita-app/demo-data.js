@@ -23,7 +23,7 @@
       { token: 'gruppe', name: 'Kita-Gruppenchat', unread: 3, avatar: '🌳', messages: [
         { who: 'Team Bauwagen', text: 'Guten Morgen! Heute bitte Matschhosen mitgeben, es ist sehr nass im Wald.', t: at(0, 7, 42) },
         { who: 'Anna (Eltern)', text: 'Hat jemand eine blaue Mütze mit Bommel gefunden? 🙈', t: at(0, 9, 5) },
-        { who: 'Team Bauwagen', text: 'Liegt in der Fundkiste am Bauwagen 👍', t: at(0, 9, 31) },
+        { who: 'Team Bauwagen', text: 'Liegt in der Fundkiste am Bauwagen 👍', t: at(0, 9, 31), reactions: { '👍': 2, '❤️': 1 }, mine: ['👍'] },
       ]},
       { token: 'team', name: 'Fragen an das Team', unread: 0, avatar: '🧑‍🏫', messages: [
         { who: 'Team Bauwagen', text: 'Danke für die Krankmeldung, gute Besserung!', t: at(-2, 8, 15) },

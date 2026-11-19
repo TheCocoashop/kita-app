@@ -139,6 +139,20 @@ a.card, button.card { display: block; width: 100%; text-align: left; color: inhe
 .msg .body > :last-child { margin-bottom: 0; }
 .msg .body h1, .msg .body h2, .msg .body h3 { font-size: 16px; margin: 6px 0 4px; }
 .msg .body p, .msg .body ul { margin: 4px 0; }
+.reacts { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.react {
+  font: inherit; font-size: 14px; line-height: 1; padding: 5px 9px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--rule); background: var(--bg); color: var(--ink);
+}
+.react.mine { border-color: var(--green); background: var(--green-soft); color: var(--green); font-weight: 600; }
+.react.add { color: var(--soft); background: transparent; opacity: .7; padding: 5px 8px; }
+.picker { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; padding: 5px; border-radius: 14px; background: var(--bg); border: 1px solid var(--rule); }
+.picker button { font-size: 22px; line-height: 1; padding: 6px 7px; border: 0; background: transparent; cursor: pointer; border-radius: 10px; }
+.picker button:active { background: var(--green-soft); }
+.msg.me .react { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.35); color: #fff; }
+.msg.me .react.mine { background: #fff; border-color: #fff; color: var(--green); }
+.msg.me .react.add { background: transparent; color: rgba(255,255,255,.85); }
+.msg.me .picker { background: #fff; }
 .msg.me a { color: inherit; }
 .msg.me { align-self: flex-end; background: var(--green); color: #fff; border-color: transparent; }
 .msg.me .time { color: rgba(255,255,255,.75); }

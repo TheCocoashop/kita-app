@@ -47,6 +47,11 @@ function toContact(c, i) {
 // ======================================================================
 function demoApi(D) {
   const wait = (v) => new Promise((r) => setTimeout(() => r(v), 120));
+  // Demo-Nachrichten bekommen Nummern und Reaktionen (nur im Speicher)
+  const demoChat = (c) => {
+    c.messages.forEach((m, i) => { if (m.id === undefined) { m.id = i + 1; m.reactions = m.reactions || {}; m.mine = m.mine || []; } });
+    return c;
+  };
   const summary = (c) => ({ token: c.token, name: c.name, unread: c.unread, avatar: c.avatar, last: c.messages[c.messages.length - 1] });
 
   return {
@@ -58,10 +63,19 @@ function demoApi(D) {
     upcomingEvents: (limit) => wait(D.events.filter((e) => (e.end || e.start) >= startOfToday()).slice(0, limit)),
     monthEvents: () => wait(D.events),
     chats: () => wait(D.chats.map(summary)),
-    chat: (token) => wait(D.chats.find((c) => c.token === token)),
+    chat: (token) => wait(demoChat(D.chats.find((c) => c.token === token))),
     sendMessage: (token, text) => {
       const c = D.chats.find((c) => c.token === token);
       c.messages.push({ who: D.user.displayName, text, t: new Date(), me: true });
+      return wait(demoChat(c).messages);
+    },
+    react: (token, id, emoji, on) => {
+      const c = demoChat(D.chats.find((c) => c.token === token));
+      const m = c.messages.find((x) => x.id === id);
+      const mine = m.mine.filter((e) => e !== emoji).concat(on ? [emoji] : []);
+      m.reactions = { ...m.reactions }; m.mine = mine;
+      m.reactions[emoji] = Math.max(0, (m.reactions[emoji] || 0) + (on ? 1 : -1));
+      if (!m.reactions[emoji]) delete m.reactions[emoji];
       return wait(c.messages);
     },
     markRead: (token) => { D.chats.find((c) => c.token === token).unread = 0; return wait(); },
@@ -477,6 +491,8 @@ function nextcloudApi(cfg) {
       text: talkText(m),
       t: new Date(m.timestamp * 1000),
       me: m.actorType === 'users' && m.actorId === cfg.uid,
+      reactions: m.reactions || {},
+      mine: m.reactionsSelf || [],
     };
   }
 
@@ -676,6 +692,11 @@ function nextcloudApi(cfg) {
     },
     async sendMessage(token, text) {
       await req(ocs(`/apps/spreed/api/v1/chat/${encodeURIComponent(token)}`), { method: 'POST', body: JSON.stringify({ message: text }) });
+      return (await this.chat(token)).messages;
+    },
+    // Emoji-Reaktion setzen (on = true) oder zurücknehmen
+    async react(token, id, emoji, on) {
+      await req(ocs(`/apps/spreed/api/v1/reaction/${encodeURIComponent(token)}/${id}`), { method: on ? 'POST' : 'DELETE', body: JSON.stringify({ reaction: emoji }) });
       return (await this.chat(token)).messages;
     },
     // „setReadMarker“ beim Laden wirkt bei Talk nur im Live-Modus; die Lesemarke muss ausdrücklich gesetzt werden
