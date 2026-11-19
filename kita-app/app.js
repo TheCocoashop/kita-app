@@ -278,8 +278,8 @@ function renderAbwesend(st) {
   const later = st.list ? st.list.filter((x) => x.from > st.today) : [];
   const teamHtml = st.team ? `
     <h2 class="section">Heute fehlen: ${today.length}</h2>
-    ${today.length ? `<div class="list">${today.map((x) => `<div class="row"><div class="grow"><div class="title">${esc(x.child)}</div><div class="meta">${esc([absRange(x), absWhen(x)].filter(Boolean).join(' · '))}</div></div><span class="pill">${esc(st.kinds[x.kind] || x.kind)}</span></div>`).join('')}</div>` : '<p class="meta">Keine Meldung für heute.</p>'}
-    ${later.length ? `<h2 class="section">Kommende Tage</h2><div class="list">${later.map((x) => `<div class="row"><div class="grow"><div class="title">${esc(x.child)}</div><div class="meta">${esc([absRange(x), absWhen(x)].filter(Boolean).join(' · '))}</div></div><span class="pill">${esc(st.kinds[x.kind] || x.kind)}</span></div>`).join('')}</div>` : ''}
+    ${today.length ? `<div class="list">${today.map((x) => `<div class="row"><div class="grow"><div class="title">${esc(x.child)}</div><div class="meta">${esc([absRange(x), absWhen(x), x.note].filter(Boolean).join(' · '))}</div></div><span class="pill">${esc(st.kinds[x.kind] || x.kind)}</span></div>`).join('')}</div>` : '<p class="meta">Keine Meldung für heute.</p>'}
+    ${later.length ? `<h2 class="section">Kommende Tage</h2><div class="list">${later.map((x) => `<div class="row"><div class="grow"><div class="title">${esc(x.child)}</div><div class="meta">${esc([absRange(x), absWhen(x), x.note].filter(Boolean).join(' · '))}</div></div><span class="pill">${esc(st.kinds[x.kind] || x.kind)}</span></div>`).join('')}</div>` : ''}
     <a class="more" href="#/abwesend/pruefen">Stimmen die Daten? Prüfseite ›</a>` : '';
   const formHtml = st.children.length ? `
     <h2 class="section">Kind abwesend melden</h2>
@@ -298,12 +298,13 @@ function renderAbwesend(st) {
       <div class="field-title">Grund
         <div class="list">${kinds.map(([k, label], i) => `<label class="row choose ${i === 0 ? 'on' : ''}"><input type="radio" name="kind" value="${esc(k)}" ${i === 0 ? 'checked' : ''}><div class="grow"><div class="title">${esc(label)}</div></div></label>`).join('')}</div>
       </div>
+      <label id="abs-note" hidden>Anmerkung (freiwillig)<input name="note" maxlength="60" placeholder="z. B. Arzttermin um 9 Uhr" autocomplete="off"></label>
       <button class="btn" type="submit">Melden</button>
-      <p class="meta">Gespeichert werden nur Vorname, Zeitraum und Art. Bitte keine Diagnose angeben. Das Team sieht die Meldung, sonst niemand.</p>
+      <p class="meta">Gespeichert werden nur Vorname, Zeitraum, Art und eine freiwillige kurze Anmerkung. Bitte keine Diagnose angeben. Das Team sieht die Meldung, sonst niemand.</p>
     </form>` : (st.team ? '' : '<p class="meta">Wir finden eure Familie nicht. ${esc(helpHint())}, damit eure Mailadresse in der Elternliste ergänzt wird.</p>');
   const mineHtml = st.mine.length ? `
     <h2 class="section">Eure Meldungen</h2>
-    <div class="list">${st.mine.map((x) => `<div class="row" data-id="${x.id}"><div class="grow"><div class="title">${esc(x.child)}</div><div class="meta">${esc([absRange(x), absWhen(x), st.kinds[x.kind] || x.kind].filter(Boolean).join(' · '))}</div></div><button class="btn secondary" data-cancel>Zurückziehen</button></div>`).join('')}</div>` : '';
+    <div class="list">${st.mine.map((x) => `<div class="row" data-id="${x.id}"><div class="grow"><div class="title">${esc(x.child)}</div><div class="meta">${esc([absRange(x), absWhen(x), st.kinds[x.kind] || x.kind, x.note].filter(Boolean).join(' · '))}</div></div><button class="btn secondary" data-cancel>Zurückziehen</button></div>`).join('')}</div>` : '';
   show('Abwesend', teamHtml + formHtml + mineHtml);
 
   const form = document.getElementById('abs-form');
@@ -319,13 +320,14 @@ function renderAbwesend(st) {
     syncPart();
     form.querySelectorAll('.row.choose input').forEach((r) => r.addEventListener('change', () => {
       form.querySelectorAll('.row.choose').forEach((row) => row.classList.toggle('on', row.querySelector('input').checked));
+      document.getElementById('abs-note').hidden = form.elements.kind.value !== 'sonstiges';
     }));
     form.elements.from.addEventListener('change', () => { if (form.elements.to.value < form.elements.from.value) form.elements.to.value = form.elements.from.value; });
     form.addEventListener('submit', async (ev) => {
       ev.preventDefault();
       const f = Object.fromEntries(new FormData(form));
       try {
-        const next = await submitting(form, () => api.absenceReport({ child: f.child, from: f.from, to: f.part === 'day' ? f.to : f.from, kind: f.kind, part: f.part || 'day', time: f.part === 'day' ? '' : (f.time || '') }), 'Das hat leider nicht geklappt.');
+        const next = await submitting(form, () => api.absenceReport({ child: f.child, from: f.from, to: f.part === 'day' ? f.to : f.from, kind: f.kind, part: f.part || 'day', time: f.part === 'day' ? '' : (f.time || ''), note: f.kind === 'sonstiges' ? (f.note || '') : '' }), 'Das hat leider nicht geklappt.');
         renderAbwesend(next);
         alert(`Danke, ${f.child} ist abgemeldet.`);
       } catch {}

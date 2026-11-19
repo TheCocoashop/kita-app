@@ -28,8 +28,8 @@ class AbsenceController extends Controller {
 	}
 
 	#[NoAdminRequired]
-	public function create(string $child, string $from, string $to, string $kind, string $part = 'day', string $time = ''): DataResponse {
-		return $this->run(fn () => $this->absence->report($this->userSession->getUser(), $child, $from, $to, $kind, $part, $time));
+	public function create(string $child, string $from, string $to, string $kind, string $part = 'day', string $time = '', string $note = ''): DataResponse {
+		return $this->run(fn () => $this->absence->report($this->userSession->getUser(), $child, $from, $to, $kind, $part, $time, $note));
 	}
 
 	#[NoAdminRequired]

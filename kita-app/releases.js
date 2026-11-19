@@ -3,6 +3,12 @@
 // nextcloud/kitaapp/appinfo/info.xml angleichen.
 const RELEASES = [
   {
+    version: '1.7.2', date: '2026-11-19',
+    notes: [
+      'Abwesend: Bei „sonstiges“ gibt es jetzt ein kurzes Feld für eine Anmerkung, zum Beispiel „Arzttermin um 9 Uhr“. „Arzttermin“ als eigene Auswahl entfällt.',
+    ],
+  },
+  {
     version: '1.7.1', date: '2026-11-19',
     notes: [
       'Chat: Auf Nachrichten kann jetzt mit Emojis reagiert werden. Auf „＋☺“ unter der Nachricht tippen und ein Emoji wählen. Ein Emoji, das schon da ist, tippt man an, um sich anzuschließen oder die eigene Reaktion zurückzunehmen. Die Reaktionen sind auch in der Nextcloud (Talk) zu sehen.',
