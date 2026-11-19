@@ -3,6 +3,13 @@
 // nextcloud/kitaapp/appinfo/info.xml angleichen.
 const RELEASES = [
   {
+    version: '1.7.3', date: '2026-11-19',
+    notes: [
+      'Umfragen: Unten gibt es jetzt „Link zur Umfrage teilen“. Der Link öffnet die Umfrage in der KiTa-App-Seite statt in der Nextcloud-Webseite.',
+      'Abwesend: Die Anmerkung bei „sonstiges“ ist auf 30 Zeichen begrenzt.',
+    ],
+  },
+  {
     version: '1.7.2', date: '2026-11-19',
     notes: [
       'Abwesend: Bei „sonstiges“ gibt es jetzt ein kurzes Feld für eine Anmerkung, zum Beispiel „Arzttermin um 9 Uhr“. „Arzttermin“ als eigene Auswahl entfällt.',

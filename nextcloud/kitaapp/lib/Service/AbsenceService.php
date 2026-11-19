@@ -24,7 +24,7 @@ use Psr\Log\LoggerInterface;
  */
 class AbsenceService {
 	public const KINDS = ['krank' => 'krank', 'urlaub' => 'Urlaub', 'sonstiges' => 'sonstiges'];
-	private const NOTE_MAX = 60;
+	private const NOTE_MAX = 30;
 	/** ganztägig, kommt später (ab Uhrzeit), geht früher (bis Uhrzeit) */
 	public const PARTS = ['day' => 'ganztägig', 'late' => 'kommt später', 'early' => 'geht früher'];
 	private const MAX_DAYS = 120;

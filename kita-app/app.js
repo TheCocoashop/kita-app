@@ -298,7 +298,7 @@ function renderAbwesend(st) {
       <div class="field-title">Grund
         <div class="list">${kinds.map(([k, label], i) => `<label class="row choose ${i === 0 ? 'on' : ''}"><input type="radio" name="kind" value="${esc(k)}" ${i === 0 ? 'checked' : ''}><div class="grow"><div class="title">${esc(label)}</div></div></label>`).join('')}</div>
       </div>
-      <label id="abs-note" hidden>Anmerkung (freiwillig)<input name="note" maxlength="60" placeholder="z. B. Arzttermin um 9 Uhr" autocomplete="off"></label>
+      <label id="abs-note" hidden>Anmerkung (freiwillig)<input name="note" maxlength="30" placeholder="z. B. Arzttermin" autocomplete="off"></label>
       <button class="btn" type="submit">Melden</button>
       <p class="meta">Gespeichert werden nur Vorname, Zeitraum, Art und eine freiwillige kurze Anmerkung. Bitte keine Diagnose angeben. Das Team sieht die Meldung, sonst niemand.</p>
     </form>` : (st.team ? '' : '<p class="meta">Wir finden eure Familie nicht. ${esc(helpHint())}, damit eure Mailadresse in der Elternliste ergänzt wird.</p>');
@@ -1105,8 +1105,22 @@ async function viewUmfrage(id) {
   let p = await api.poll(id);
   if (!p) return show('Umfragen', '<p class="empty">Umfrage nicht gefunden.</p>');
   let busy = false;
+  const addShare = () => {
+    $view.insertAdjacentHTML('beforeend', '<button class="btn secondary" id="share-poll" style="margin-top:12px">🔗 Link zur Umfrage teilen</button>');
+    document.getElementById('share-poll').addEventListener('click', async (ev) => {
+      const url = location.href.split('#')[0].split('?')[0] + '#/umfragen/' + encodeURIComponent(p.id);
+      const text = `${p.title}\nBitte am besten in der KiTa-App abstimmen (unter „Termine“ bei „Umfragen“). Dieser Link öffnet die Umfrage dort:\n${url}`;
+      try {
+        if (navigator.share) await navigator.share({ text });
+        else { await navigator.clipboard.writeText(text); ev.target.textContent = 'Kopiert ✓'; }
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;
+        prompt('Text kopieren:', text);
+      }
+    });
+  };
   const draw = () => {
-    if (p.isDate) return drawDates();
+    if (p.isDate) { drawDates(); return addShare(); }
     const max = Math.max(1, ...p.options.map((o) => o.votes));
     show('Umfrage', `
       <div class="page"><h1>${esc(p.title)}</h1></div>
@@ -1145,6 +1159,7 @@ async function viewUmfrage(id) {
       busy = false;
       draw();
     }));
+    addShare();
   };
   const drawDates = () => {
     const max = Math.max(0, ...p.options.map((o) => o.votes));
