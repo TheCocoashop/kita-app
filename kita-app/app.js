@@ -246,7 +246,7 @@ function absenceCard(abs) {
     const today = (abs.list || []).filter((x) => x.from <= abs.today && x.to >= abs.today);
     return `<a class="card ${today.length ? 'highlight' : ''}" href="#/abwesend">
       <h3>🩺 Heute fehlen: ${today.length}</h3>
-      <div class="meta ellipsis">${today.length ? esc(today.map((x) => x.child).join(', ')) : 'Keine Meldung für heute.'}</div>
+      <div class="meta ellipsis">${today.length ? esc(today.map(absName).join(', ')) : 'Keine Meldung für heute.'}</div>
       <span class="more">Zur Liste ›</span></a>`;
   }
   return abs.children.length ? `<a class="btn add" href="#/abwesend" style="margin:0 0 14px">🩺 Kind abwesend melden</a>` : '';
@@ -256,6 +256,14 @@ function absRange(x) {
   const d = (iso) => fmtDate(new Date(iso + 'T00:00:00'), { weekday: 'short', day: 'numeric', month: 'numeric' });
   return x.from === x.to ? d(x.from) : `${d(x.from)} – ${d(x.to)}`;
 }
+
+// „ab 9:00“ / „bis 9:00“ bei späterem Kommen oder früherem Gehen
+function absWhen(x) {
+  if (x.part === 'late' && x.time) return `kommt um ${x.time} Uhr`;
+  if (x.part === 'early' && x.time) return `geht um ${x.time} Uhr`;
+  return '';
+}
+const absName = (x) => x.child + (x.part === 'late' && x.time ? ` (ab ${x.time})` : x.part === 'early' && x.time ? ` (bis ${x.time})` : '');
 
 async function viewAbwesend() {
   show('Abwesend', '<p class="empty">Lädt …</p>');
@@ -270,8 +278,8 @@ function renderAbwesend(st) {
   const later = st.list ? st.list.filter((x) => x.from > st.today) : [];
   const teamHtml = st.team ? `
     <h2 class="section">Heute fehlen: ${today.length}</h2>
-    ${today.length ? `<div class="list">${today.map((x) => `<div class="row"><div class="grow"><div class="title">${esc(x.child)}</div><div class="meta">${esc(absRange(x))}</div></div><span class="pill">${esc(st.kinds[x.kind] || x.kind)}</span></div>`).join('')}</div>` : '<p class="meta">Keine Meldung für heute.</p>'}
-    ${later.length ? `<h2 class="section">Kommende Tage</h2><div class="list">${later.map((x) => `<div class="row"><div class="grow"><div class="title">${esc(x.child)}</div><div class="meta">${esc(absRange(x))}</div></div><span class="pill">${esc(st.kinds[x.kind] || x.kind)}</span></div>`).join('')}</div>` : ''}
+    ${today.length ? `<div class="list">${today.map((x) => `<div class="row"><div class="grow"><div class="title">${esc(x.child)}</div><div class="meta">${esc([absRange(x), absWhen(x)].filter(Boolean).join(' · '))}</div></div><span class="pill">${esc(st.kinds[x.kind] || x.kind)}</span></div>`).join('')}</div>` : '<p class="meta">Keine Meldung für heute.</p>'}
+    ${later.length ? `<h2 class="section">Kommende Tage</h2><div class="list">${later.map((x) => `<div class="row"><div class="grow"><div class="title">${esc(x.child)}</div><div class="meta">${esc([absRange(x), absWhen(x)].filter(Boolean).join(' · '))}</div></div><span class="pill">${esc(st.kinds[x.kind] || x.kind)}</span></div>`).join('')}</div>` : ''}
     <a class="more" href="#/abwesend/pruefen">Stimmen die Daten? Prüfseite ›</a>` : '';
   const formHtml = st.children.length ? `
     <h2 class="section">Kind abwesend melden</h2>
@@ -279,27 +287,45 @@ function renderAbwesend(st) {
       ${st.children.length > 1
         ? `<label>Kind<select name="child">${st.children.map((c) => `<option>${esc(c)}</option>`).join('')}</select></label>`
         : `<input type="hidden" name="child" value="${esc(st.children[0])}"><p class="meta">Kind: <b>${esc(st.children[0])}</b></p>`}
+      <div class="field-title">Wann?
+        <div class="segmented three">${Object.entries(st.parts || { day: 'ganztägig' }).map(([k, label], i) => `<label><input type="radio" name="part" value="${esc(k)}" ${i === 0 ? 'checked' : ''}><span>${esc(label)}</span></label>`).join('')}</div>
+      </div>
       <div class="two">
         <label>von<input type="date" name="from" required value="${st.today}"></label>
-        <label>bis<input type="date" name="to" required value="${st.today}"></label>
+        <label id="abs-to">bis<input type="date" name="to" required value="${st.today}"></label>
+        <label id="abs-time" hidden>Uhrzeit<input type="time" name="time" value="09:00"></label>
       </div>
-      <div class="list">${kinds.map(([k, label], i) => `<label class="row choose"><input type="radio" name="kind" value="${esc(k)}" ${i === 0 ? 'checked' : ''}><div class="grow"><div class="title">${esc(label)}</div></div></label>`).join('')}</div>
+      <div class="field-title">Grund
+        <div class="list">${kinds.map(([k, label], i) => `<label class="row choose ${i === 0 ? 'on' : ''}"><input type="radio" name="kind" value="${esc(k)}" ${i === 0 ? 'checked' : ''}><div class="grow"><div class="title">${esc(label)}</div></div></label>`).join('')}</div>
+      </div>
       <button class="btn" type="submit">Melden</button>
       <p class="meta">Gespeichert werden nur Vorname, Zeitraum und Art. Bitte keine Diagnose angeben. Das Team sieht die Meldung, sonst niemand.</p>
     </form>` : (st.team ? '' : '<p class="meta">Wir finden eure Familie nicht. ${esc(helpHint())}, damit eure Mailadresse in der Elternliste ergänzt wird.</p>');
   const mineHtml = st.mine.length ? `
     <h2 class="section">Eure Meldungen</h2>
-    <div class="list">${st.mine.map((x) => `<div class="row" data-id="${x.id}"><div class="grow"><div class="title">${esc(x.child)}</div><div class="meta">${esc(absRange(x))} · ${esc(st.kinds[x.kind] || x.kind)}</div></div><button class="btn secondary" data-cancel>Zurückziehen</button></div>`).join('')}</div>` : '';
+    <div class="list">${st.mine.map((x) => `<div class="row" data-id="${x.id}"><div class="grow"><div class="title">${esc(x.child)}</div><div class="meta">${esc([absRange(x), absWhen(x), st.kinds[x.kind] || x.kind].filter(Boolean).join(' · '))}</div></div><button class="btn secondary" data-cancel>Zurückziehen</button></div>`).join('')}</div>` : '';
   show('Abwesend', teamHtml + formHtml + mineHtml);
 
   const form = document.getElementById('abs-form');
   if (form) {
+    const syncPart = () => {
+      const day = form.elements.part.value === 'day';
+      document.getElementById('abs-to').hidden = !day;
+      document.getElementById('abs-time').hidden = day;
+      document.getElementById('abs-time').querySelector('input').required = !day;
+      document.querySelector('#abs-form [name=time]').closest('label').firstChild.textContent = form.elements.part.value === 'late' ? 'Kommt um' : 'Geht um';
+    };
+    form.querySelectorAll('[name=part]').forEach((r) => r.addEventListener('change', syncPart));
+    syncPart();
+    form.querySelectorAll('.row.choose input').forEach((r) => r.addEventListener('change', () => {
+      form.querySelectorAll('.row.choose').forEach((row) => row.classList.toggle('on', row.querySelector('input').checked));
+    }));
     form.elements.from.addEventListener('change', () => { if (form.elements.to.value < form.elements.from.value) form.elements.to.value = form.elements.from.value; });
     form.addEventListener('submit', async (ev) => {
       ev.preventDefault();
       const f = Object.fromEntries(new FormData(form));
       try {
-        const next = await submitting(form, () => api.absenceReport({ child: f.child, from: f.from, to: f.to, kind: f.kind }), 'Das hat leider nicht geklappt.');
+        const next = await submitting(form, () => api.absenceReport({ child: f.child, from: f.from, to: f.part === 'day' ? f.to : f.from, kind: f.kind, part: f.part || 'day', time: f.part === 'day' ? '' : (f.time || '') }), 'Das hat leider nicht geklappt.');
         renderAbwesend(next);
         alert(`Danke, ${f.child} ist abgemeldet.`);
       } catch {}

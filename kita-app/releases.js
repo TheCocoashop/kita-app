@@ -3,6 +3,15 @@
 // nextcloud/kitaapp/appinfo/info.xml angleichen.
 const RELEASES = [
   {
+    version: '1.7.0', date: '2026-11-19',
+    notes: [
+      'Abwesend: Die Auswahl (krank, Urlaub, Arzttermin, sonstiges) ist jetzt deutlich markiert.',
+      'Abwesend: Neu ist „kommt später“ und „geht früher“ mit Uhrzeit, zum Beispiel bei einem Arzttermin um 9 Uhr.',
+      'Abwesend: Ein Kind lässt sich für denselben Zeitraum nur einmal melden. Wer etwas ändern will, zieht die alte Meldung zurück.',
+      'Umfragen: Der gewählte Eintrag ist jetzt ebenfalls deutlich markiert.',
+    ],
+  },
+  {
     version: '1.6.4', date: '2026-11-15',
     notes: [
       'Suche: Das gesuchte Wort wird auch im Titel des Treffers markiert.',

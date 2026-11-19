@@ -23,7 +23,9 @@ use Psr\Log\LoggerInterface;
  *   absence_retention     Aufbewahrung in Monaten (Standard 24)
  */
 class AbsenceService {
-	public const KINDS = ['krank' => 'krank', 'urlaub' => 'Urlaub', 'sonstiges' => 'sonstiges'];
+	public const KINDS = ['krank' => 'krank', 'urlaub' => 'Urlaub', 'termin' => 'Arzttermin', 'sonstiges' => 'sonstiges'];
+	/** ganztägig, kommt später (ab Uhrzeit), geht früher (bis Uhrzeit) */
+	public const PARTS = ['day' => 'ganztägig', 'late' => 'kommt später', 'early' => 'geht früher'];
 	private const MAX_DAYS = 120;
 
 	public function __construct(
@@ -85,6 +87,7 @@ class AbsenceService {
 			'enabled' => true,
 			'team' => $team,
 			'kinds' => self::KINDS,
+			'parts' => self::PARTS,
 			'today' => $today,
 			'children' => $fam ? array_map(fn ($c) => $c['name'], $fam['children']) : [],
 			'mine' => $fam ? $this->mine($fam['uid'], $today) : [],
@@ -95,7 +98,7 @@ class AbsenceService {
 		return $out;
 	}
 
-	public function report(IUser $user, string $child, string $from, string $to, string $kind): void {
+	public function report(IUser $user, string $child, string $from, string $to, string $kind, string $part = 'day', string $time = ''): void {
 		if (!$this->visibleTo($user)) {
 			throw new \RuntimeException('Die Abwesenheitsmeldung ist noch nicht freigeschaltet.');
 		}
@@ -106,7 +109,18 @@ class AbsenceService {
 			throw new \InvalidArgumentException('Dieses Kind gehört nicht zu eurer Familie.');
 		}
 		if (!isset(self::KINDS[$kind])) {
-			throw new \InvalidArgumentException('Bitte wählt krank, Urlaub oder sonstiges.');
+			throw new \InvalidArgumentException('Bitte wählt krank, Urlaub, Arzttermin oder sonstiges.');
+		}
+		if (!isset(self::PARTS[$part])) {
+			$part = 'day';
+		}
+		if ($part === 'day') {
+			$time = '';
+		} else {
+			if (!preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $time)) {
+				throw new \InvalidArgumentException('Bitte gebt die Uhrzeit an, zum Beispiel 09:00.');
+			}
+			$to = $from; // später/früher gilt nur für einen Tag
 		}
 		$d1 = \DateTimeImmutable::createFromFormat('!Y-m-d', $from);
 		$d2 = \DateTimeImmutable::createFromFormat('!Y-m-d', $to);
@@ -123,17 +137,23 @@ class AbsenceService {
 		if ($d1->diff($d2)->days > self::MAX_DAYS) {
 			throw new \InvalidArgumentException('Der Zeitraum ist zu lang. Bitte meldet höchstens ' . self::MAX_DAYS . ' Tage am Stück.');
 		}
+		// Schon eine Meldung für dasselbe Kind in diesem Zeitraum? Dann nicht doppelt anlegen.
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('id')->from('kitaapp_absence')->where(
+		$qb->select('id', 'from_date', 'to_date', 'kind', 'part', 'at_time')->from('kitaapp_absence')->where(
 			$qb->expr()->eq('card_uid', $qb->createNamedParameter($fam['uid'])),
 			$qb->expr()->eq('child', $qb->createNamedParameter($child)),
-			$qb->expr()->eq('from_date', $qb->createNamedParameter($from)),
-			$qb->expr()->eq('to_date', $qb->createNamedParameter($to)),
-			$qb->expr()->eq('kind', $qb->createNamedParameter($kind)),
+			$qb->expr()->lte('from_date', $qb->createNamedParameter($to)),
+			$qb->expr()->gte('to_date', $qb->createNamedParameter($from)),
 			$qb->expr()->eq('cancelled', $qb->createNamedParameter(0, \OCP\DB\QueryBuilder\IQueryBuilder::PARAM_INT)),
 		);
-		if ($qb->executeQuery()->fetchOne() !== false) {
-			return; // doppelt getippt
+		$existing = $qb->executeQuery()->fetchAll();
+		foreach ($existing as $e) {
+			if ($e['from_date'] === $from && $e['to_date'] === $to && $e['kind'] === $kind && ($e['part'] ?? 'day') === $part && (string)($e['at_time'] ?? '') === $time) {
+				return; // doppelt getippt
+			}
+		}
+		if ($existing) {
+			throw new \InvalidArgumentException($child . ' ist für diesen Zeitraum schon gemeldet. Bitte unten bei „Eure Meldungen“ die alte Meldung zurückziehen und dann neu melden.');
 		}
 		$qb = $this->db->getQueryBuilder();
 		$qb->insert('kitaapp_absence')->values([
@@ -142,13 +162,15 @@ class AbsenceService {
 			'from_date' => $qb->createNamedParameter($from),
 			'to_date' => $qb->createNamedParameter($to),
 			'kind' => $qb->createNamedParameter($kind),
+			'part' => $qb->createNamedParameter($part),
+			'at_time' => $qb->createNamedParameter($time === '' ? null : $time),
 			'reported_by' => $qb->createNamedParameter($user->getUID()),
 			'reported_at' => $qb->createNamedParameter(time(), \OCP\DB\QueryBuilder\IQueryBuilder::PARAM_INT),
 			'cancelled' => $qb->createNamedParameter(0, \OCP\DB\QueryBuilder\IQueryBuilder::PARAM_INT),
 		])->executeStatement();
 		$this->purge();
 		if ($from <= $today && $to >= $today) {
-			$this->mailTeam($child, $from, $to);
+			$this->mailTeam($child, $from, $to, $part, $time);
 		}
 	}
 
@@ -207,25 +229,25 @@ class AbsenceService {
 
 	private function mine(string $uid, string $today): array {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('id', 'child', 'from_date', 'to_date', 'kind')->from('kitaapp_absence')->where(
+		$qb->select('id', 'child', 'from_date', 'to_date', 'kind', 'part', 'at_time')->from('kitaapp_absence')->where(
 			$qb->expr()->eq('card_uid', $qb->createNamedParameter($uid)),
 			$qb->expr()->eq('cancelled', $qb->createNamedParameter(0, \OCP\DB\QueryBuilder\IQueryBuilder::PARAM_INT)),
 			$qb->expr()->gte('to_date', $qb->createNamedParameter($today)),
 		)->orderBy('from_date')->addOrderBy('child');
-		return array_map(fn ($r) => ['id' => (int)$r['id'], 'child' => $r['child'], 'from' => $r['from_date'], 'to' => $r['to_date'], 'kind' => $r['kind']], $qb->executeQuery()->fetchAll());
+		return array_map(fn ($r) => ['id' => (int)$r['id'], 'child' => $r['child'], 'from' => $r['from_date'], 'to' => $r['to_date'], 'kind' => $r['kind'], 'part' => $r['part'] ?? 'day', 'time' => (string)($r['at_time'] ?? '')], $qb->executeQuery()->fetchAll());
 	}
 
 	/** Alle Meldungen, die in den nächsten $days Tagen (ab heute) einen Tag berühren. */
 	private function upcoming(string $today, int $days): array {
 		$end = (new \DateTimeImmutable($today))->modify("+$days days")->format('Y-m-d');
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('id', 'child', 'group_name', 'from_date', 'to_date', 'kind')->from('kitaapp_absence')->where(
+		$qb->select('id', 'child', 'group_name', 'from_date', 'to_date', 'kind', 'part', 'at_time')->from('kitaapp_absence')->where(
 			$qb->expr()->eq('cancelled', $qb->createNamedParameter(0, \OCP\DB\QueryBuilder\IQueryBuilder::PARAM_INT)),
 			$qb->expr()->gte('to_date', $qb->createNamedParameter($today)),
 			$qb->expr()->lte('from_date', $qb->createNamedParameter($end)),
 		)->orderBy('from_date')->addOrderBy('child');
 		return array_map(fn ($r) => [
-			'child' => $r['child'], 'group' => $r['group_name'] ?? '', 'from' => $r['from_date'], 'to' => $r['to_date'], 'kind' => $r['kind'],
+			'child' => $r['child'], 'group' => $r['group_name'] ?? '', 'from' => $r['from_date'], 'to' => $r['to_date'], 'kind' => $r['kind'], 'part' => $r['part'] ?? 'day', 'time' => (string)($r['at_time'] ?? ''),
 		], $qb->executeQuery()->fetchAll());
 	}
 
@@ -237,7 +259,7 @@ class AbsenceService {
 		$qb->delete('kitaapp_absence')->where($qb->expr()->lt('to_date', $qb->createNamedParameter($cut)))->executeStatement();
 	}
 
-	private function mailTeam(string $child, string $from, string $to): void {
+	private function mailTeam(string $child, string $from, string $to, string $part = 'day', string $time = ''): void {
 		$addr = trim($this->config->getValueString($this->appName, 'absence_team_mail', ''));
 		if ($addr === '') {
 			return;
@@ -246,8 +268,9 @@ class AbsenceService {
 			$de = fn (string $iso) => (new \DateTimeImmutable($iso))->format('d.m.Y');
 			$msg = $this->mailer->createMessage();
 			$msg->setTo([$addr => 'Team']);
-			$msg->setSubject('Abwesenheit heute: ' . $child);
-			$msg->setPlainBody("Neue Abmeldung in der KiTa-App:\n\n  {$child}, " . ($from === $to ? $de($from) : $de($from) . ' bis ' . $de($to)) . "\n\nDie ganze Liste: Handy-App, Seite „Abwesend“.\n\n" . $this->org->name() . "\n");
+			$when = $part === 'late' ? " (kommt um {$time} Uhr)" : ($part === 'early' ? " (geht um {$time} Uhr)" : '');
+			$msg->setSubject('Abwesenheit heute: ' . $child . $when);
+			$msg->setPlainBody("Neue Abmeldung in der KiTa-App:\n\n  {$child}{$when}, " . ($from === $to ? $de($from) : $de($from) . ' bis ' . $de($to)) . "\n\nDie ganze Liste: Handy-App, Seite „Abwesend“.\n\n" . $this->org->name() . "\n");
 			$this->mailer->send($msg);
 		} catch (\Throwable $e) {
 			$this->logger->warning('Abwesenheits-Mail nicht gesendet: ' . $e->getMessage(), ['app' => $this->appName]);
