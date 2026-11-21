@@ -169,6 +169,12 @@ function demoPoll(p) {
   if (!p) return p;
   p.mine = p.mine || [];
   if (p.isDate) p.options.forEach((o) => { o.text = fmtPollRange(o.start, o.end); o.myAnswer = o.myAnswer || ''; });
+  // Ausgedachte Namen für die Anzeige „Wer?“
+  const pool = ['Anna', 'Jonas', 'Katrin', 'Sophie', 'Familie Pilz', 'Lukas', 'Mara', 'Tim'];
+  p.options.forEach((o, i) => {
+    const mine = p.isDate ? o.myAnswer === 'yes' : p.mine.includes(i);
+    o.who = { yes: [...(mine ? ['Du'] : []), ...pool.slice(i, i + Math.max(0, Math.min(o.votes - (mine ? 1 : 0), 4)))], maybe: p.isDate ? pool.slice(5, 5 + Math.min(o.maybe || 0, 2)) : [] };
+  });
   return { ...p, multi: p.isDate || p.multi, voted: p.isDate ? p.options.some((o) => o.myAnswer) : p.mine.length > 0 };
 }
 
@@ -498,7 +504,7 @@ function nextcloudApi(cfg) {
 
   // ---------------- Umfragen (Polls) ----------------
   // Die Polls-App hat ihr Datenformat mehrfach geändert, daher wird defensiv gelesen.
-  function normalizePoll(p, options) {
+  function normalizePoll(p, options, votes) {
     const c = p.configuration || p;
     const expire = Number(c.expire || 0);
     const expired = p.status?.isExpired ?? p.expired ?? (expire > 0 && expire * 1000 < Date.now());
@@ -511,6 +517,7 @@ function nextcloudApi(cfg) {
       votes: Number(o.votes?.yes ?? o.yes ?? 0),
       maybe: Number(o.votes?.maybe ?? o.maybe ?? 0),
       myAnswer: o.votes?.currentUser || '',
+      who: whoOf(o, votes),
     }));
     return {
       id: p.id,
@@ -528,6 +535,24 @@ function nextcloudApi(cfg) {
       options: opts,
       mine: opts.map((o, i) => (o.myAnswer === 'yes' ? i : -1)).filter((i) => i >= 0),
     };
+  }
+  // Wer hat wie abgestimmt? Nur sichtbar, wenn die Umfrage nicht anonym ist; sonst bleibt die Liste leer.
+  function whoOf(o, votes) {
+    const who = { yes: [], maybe: [] };
+    for (const v of votes || []) {
+      const ans = v.answer ?? v.voteAnswer;
+      if (v.deleted || (ans !== 'yes' && ans !== 'maybe')) continue;
+      if (!((v.optionId ?? v.option?.id) === o.id || (v.optionText ?? v.voteOptionText) === o.text)) continue;
+      const uid = v.user?.userId ?? v.userId;
+      const name = uid === cfg.uid ? 'Du' : (v.user?.displayName || uid || '').trim();
+      if (name) who[ans].push(name);
+    }
+    const byName = (a, b) => (a === 'Du' ? -1 : b === 'Du' ? 1 : a.localeCompare(b, 'de'));
+    who.yes.sort(byName); who.maybe.sort(byName);
+    return who;
+  }
+  async function loadVotes(id) {
+    try { return (await polls(`/poll/${id}/votes`)).votes || []; } catch (e) { return []; }
   }
   async function loadOptions(id) {
     const data = await polls(`/poll/${id}/options`);
@@ -711,8 +736,8 @@ function nextcloudApi(cfg) {
       return list.filter((p) => !p.archived).sort((a, b) => (b.open - a.open) || ((a.ends || 0) - (b.ends || 0)));
     },
     async poll(id) {
-      const [p, options] = await Promise.all([polls(`/poll/${id}`), loadOptions(id)]);
-      return normalizePoll(p.poll || p, options);
+      const [p, options, votes] = await Promise.all([polls(`/poll/${id}`), loadOptions(id), loadVotes(id)]);
+      return normalizePoll(p.poll || p, options, votes);
     },
     async vote(id, idx) {
       const p = await this.poll(id);

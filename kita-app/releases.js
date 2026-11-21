@@ -3,6 +3,12 @@
 // nextcloud/kitaapp/appinfo/info.xml angleichen.
 const RELEASES = [
   {
+    version: '1.8.0', date: '2026-11-21',
+    notes: [
+      'Umfragen: Unter jeder Antwort steht jetzt „Wer? (3)“. Ein Tipp darauf zeigt die Namen derer, die so abgestimmt haben. So sieht auch die Person, die die Umfrage angelegt hat, wer geantwortet hat.',
+    ],
+  },
+  {
     version: '1.7.4', date: '2026-11-21',
     notes: [
       'Umfragen: Ist eine Umfrage nicht für alle freigegeben, steht jetzt „Diese Umfrage ist für dich nicht freigegeben“ statt einer Fehlermeldung.',

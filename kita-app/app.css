@@ -180,6 +180,10 @@ a.card, button.card { display: block; width: 100%; text-align: left; color: inhe
 .lightbox .close { position: absolute; top: calc(env(safe-area-inset-top) + 12px); right: 16px; color: #fff; font-size: 30px; background: none; border: 0; }
 
 /* Umfragen */
+.who { margin: -2px 6px 10px; font-size: 14px; color: var(--soft); }
+.slot .who { margin: 8px 0 0; }
+.who summary { cursor: pointer; padding: 2px 0; }
+.who p { margin: 4px 0 0; color: var(--ink); line-height: 1.4; }
 .option {
   display: flex; align-items: center; gap: 12px; width: 100%;
   padding: 13px 16px; margin-bottom: 8px; border-radius: 14px; cursor: pointer;

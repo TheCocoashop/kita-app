@@ -1115,6 +1115,19 @@ async function viewUmfrage(id) {
   }
   if (!p) return show('Umfragen', '<p class="empty">Umfrage nicht gefunden.</p>');
   let busy = false;
+  // „Wer?“ unter jeder Antwort: aufklappbar, damit die Übersicht ruhig bleibt; bleibt beim Neuzeichnen offen
+  const openWho = new Set();
+  const whoBlock = (o) => {
+    const y = o.who?.yes || [], m = o.who?.maybe || [];
+    if (!y.length && !m.length) return '';
+    return `<details class="who" data-who="${esc(String(o.id ?? o.text))}"${openWho.has(String(o.id ?? o.text)) ? ' open' : ''}>
+      <summary>Wer? (${y.length + m.length})</summary>
+      <p>${y.length ? `${m.length ? '✓ ' : ''}${esc(y.join(', '))}` : ''}${m.length ? `${y.length ? '<br>' : ''}? ${esc(m.join(', '))}` : ''}</p>
+    </details>`;
+  };
+  const trackWho = () => $view.querySelectorAll('details.who').forEach((d) => d.addEventListener('toggle', () => {
+    d.open ? openWho.add(d.dataset.who) : openWho.delete(d.dataset.who);
+  }));
   const addShare = () => {
     $view.insertAdjacentHTML('beforeend', '<button class="btn secondary" id="share-poll" style="margin-top:12px">🔗 Link zur Umfrage teilen</button>');
     document.getElementById('share-poll').addEventListener('click', async (ev) => {
@@ -1130,7 +1143,7 @@ async function viewUmfrage(id) {
     });
   };
   const draw = () => {
-    if (p.isDate) { drawDates(); return addShare(); }
+    if (p.isDate) { drawDates(); trackWho(); return addShare(); }
     const max = Math.max(1, ...p.options.map((o) => o.votes));
     show('Umfrage', `
       <div class="page"><h1>${esc(p.title)}</h1></div>
@@ -1141,7 +1154,7 @@ async function viewUmfrage(id) {
           <span class="check">${chosen ? '✓' : ''}</span>
           <span style="flex:1">${esc(o.text)}<div class="bar"><i style="width:${(o.votes / max) * 100}%"></i></div></span>
           <span class="count">${o.votes}</span>
-        </button>`;
+        </button>${whoBlock(o)}`;
       }).join('')}
       <p class="meta">${p.open
         ? `${p.multi ? 'Mehrfachauswahl möglich' : 'Eine Antwort'}${p.ends ? ' · Abstimmung endet ' + fmtRelative(p.ends) : ''}`
@@ -1169,6 +1182,7 @@ async function viewUmfrage(id) {
       busy = false;
       draw();
     }));
+    trackWho();
     addShare();
   };
   const drawDates = () => {
@@ -1185,6 +1199,7 @@ async function viewUmfrage(id) {
             <span class="count">${o.votes} ✓${o.maybe ? ` · ${o.maybe} ?` : ''}</span>
           </div>
           <div class="bar"><i style="width:${max ? (o.votes / max) * 100 : 0}%"></i></div>
+          ${whoBlock(o)}
           ${p.open ? `<div class="answers">${choices.map(([a, label]) =>
             `<button data-i="${i}" data-a="${a}" class="${o.myAnswer === a ? 'on' : ''}">${label}</button>`).join('')}</div>` : ''}
         </div>`).join('')}
