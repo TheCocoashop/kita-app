@@ -3,6 +3,12 @@
 // nextcloud/kitaapp/appinfo/info.xml angleichen.
 const RELEASES = [
   {
+    version: '1.7.4', date: '2026-11-21',
+    notes: [
+      'Umfragen: Ist eine Umfrage nicht für alle freigegeben, steht jetzt „Diese Umfrage ist für dich nicht freigegeben“ statt einer Fehlermeldung.',
+    ],
+  },
+  {
     version: '1.7.3', date: '2026-11-19',
     notes: [
       'Umfragen: Unten gibt es jetzt „Link zur Umfrage teilen“. Der Link öffnet die Umfrage in der KiTa-App-Seite statt in der Nextcloud-Webseite.',

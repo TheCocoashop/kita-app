@@ -1102,7 +1102,17 @@ function pollRow(p) {
 
 async function viewUmfrage(id) {
   show('Umfrage', '<p class="empty">Lädt …</p>');
-  let p = await api.poll(id);
+  let p;
+  try {
+    p = await api.poll(id);
+  } catch (e) {
+    // 403/404: Umfrage ist privat (nur für Eingeladene) oder gelöscht
+    if (/^(403|404) /.test(e.message)) {
+      return show('Umfrage', `<p class="empty">Diese Umfrage ist für dich nicht freigegeben.<br>Sie ist vermutlich auf „privat“ gestellt oder wurde gelöscht. ${esc(helpHint())}.</p>
+        <p class="page"><a class="btn secondary" href="#/umfragen">Alle Umfragen</a></p>`);
+    }
+    throw e;
+  }
   if (!p) return show('Umfragen', '<p class="empty">Umfrage nicht gefunden.</p>');
   let busy = false;
   const addShare = () => {
