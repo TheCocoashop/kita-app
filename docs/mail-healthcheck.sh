@@ -11,6 +11,7 @@ DOMAIN_RE='naturkindergarten-diessen\.de'
 QUEUE_MAX=20            # Mails in der Warteschlange
 QUEUE_AGE_MAX=7200      # Sekunden (2 h)
 REALERT=21600           # Alarm höchstens alle 6 h wiederholen
+HEARTBEAT=604800        # Lebenszeichen-Mail alle 7 Tage
 STATE=/var/lib/mail-healthcheck; mkdir -p "$STATE"
 exec 9>"$STATE/lock"; flock -n 9 || exit 0
 
@@ -72,5 +73,12 @@ else
     send "[KitaCloud] Mailserver wieder in Ordnung" "Der Mail-Check läuft wieder fehlerfrei ($(date '+%F %T'))."
     rm -f "$STATE/alerting" "$STATE/last_alert"
   fi
-  date +%s > "$STATE/last_ok"; echo OK
+  date +%s > "$STATE/last_ok"
+  # Wöchentliches Lebenszeichen: bleibt es aus, ist der Check selbst ausgefallen
+  hb=$(cat "$STATE/last_heartbeat" 2>/dev/null || echo 0)
+  if [ $((now-hb)) -ge $HEARTBEAT ]; then
+    send "[KitaCloud] Mail-Check läuft" "Wöchentliches Lebenszeichen: Der Mail-Check läuft und alle Prüfungen sind in Ordnung ($(date '+%F %T')). Bleibt diese Mail länger als eine Woche aus, ist der Check selbst ausgefallen (Cron /etc/cron.d/mail-healthcheck, Skript /usr/local/bin/mail-healthcheck.sh, Log /var/log/mail-healthcheck.log)." \
+      && echo "$now" > "$STATE/last_heartbeat"
+  fi
+  echo OK
 fi
