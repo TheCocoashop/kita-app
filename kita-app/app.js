@@ -978,8 +978,9 @@ async function viewChat(token) {
   api.markRead(token, c.lastId);
   show(c.name, `
     <div class="messages" id="msgs">${messagesHtml(c.messages)}</div>
-    <div class="chat-pad"></div>
+    <div class="chat-pad" id="chatpad"></div>
     <form class="composer" id="composer">
+      <div class="ctx" id="ctx" hidden></div>
       <input name="text" placeholder="Nachricht schreiben …" autocomplete="off" enterkeyhint="send">
       <button type="submit">Senden</button>
     </form>`);
@@ -993,20 +994,93 @@ async function viewChat(token) {
     if (atBottom) window.scrollTo(0, document.body.scrollHeight);
   };
 
-  document.getElementById('composer').addEventListener('submit', async (ev) => {
+  // Antworten und Bearbeiten: eine Zeile über dem Eingabefeld zeigt, worauf sich die Nachricht bezieht
+  let replyTo = null, editing = null;
+  const $form = document.getElementById('composer'), $ctx = document.getElementById('ctx'), $pad = document.getElementById('chatpad');
+  const setCtx = () => {
+    const m = replyTo || editing;
+    $ctx.hidden = !m;
+    $pad.classList.toggle('tall', !!m);
+    $form.querySelector('button[type=submit]').textContent = editing ? 'Speichern' : 'Senden';
+    if (m) {
+      $ctx.innerHTML = `<span class="ctx-text">${editing ? 'Nachricht bearbeiten' : 'Antwort an ' + esc(m.me ? 'dich' : m.who) + ': ' + esc(stripMd(m.text).slice(0, 60))}</span><button type="button" class="ctx-x" aria-label="Abbrechen">✕</button>`;
+    }
+  };
+  $ctx.addEventListener('click', (ev) => {
+    if (!ev.target.closest('.ctx-x')) return;
+    if (editing) $form.text.value = '';
+    replyTo = editing = null;
+    setCtx();
+  });
+
+  $form.addEventListener('submit', async (ev) => {
     ev.preventDefault();
     const input = ev.target.text;
     const text = input.value.trim();
     if (!text) return;
     input.value = '';
+    const was = { replyTo, editing };
     try {
-      redraw(await api.sendMessage(token, text));
-      window.scrollTo(0, document.body.scrollHeight);
+      if (editing) {
+        redraw(await api.editMessage(token, editing.id, text));
+      } else {
+        redraw(await api.sendMessage(token, text, replyTo && replyTo.id));
+        window.scrollTo(0, document.body.scrollHeight);
+      }
+      replyTo = editing = null;
+      setCtx();
     } catch (e) {
       input.value = text;
-      alert('Nachricht konnte nicht gesendet werden.');
+      replyTo = was.replyTo; editing = was.editing;
+      alert(editing
+        ? 'Die Nachricht konnte nicht geändert werden. Talk erlaubt das nur für kurze Zeit nach dem Senden.'
+        : 'Nachricht konnte nicht gesendet werden.');
     }
   });
+
+  // Menü unter der Nachricht: Antworten, Kopieren, Bearbeiten, Löschen, Erinnerung
+  const closeMenus = () => $msgs.querySelectorAll('.msgmenu').forEach((x) => x.remove());
+  const copyText = async (text) => {
+    try { await navigator.clipboard.writeText(text); return true; } catch (e) { /* Rückfall unten */ }
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { /* egal */ }
+    ta.remove();
+    return ok;
+  };
+  const remindAt = (key) => {
+    const d = new Date();
+    if (key === 'hour') return new Date(d.getTime() + 3600e3);
+    if (key === 'evening') { d.setHours(18, 0, 0, 0); if (d <= new Date()) d.setDate(d.getDate() + 1); return d; }
+    if (key === 'morning') { d.setDate(d.getDate() + 1); d.setHours(8, 0, 0, 0); return d; }
+    d.setDate(d.getDate() + ((8 - d.getDay()) % 7 || 7)); d.setHours(8, 0, 0, 0); return d; // nächster Montag
+  };
+  const flash = (btn, text) => { const old = btn.textContent; btn.textContent = text; setTimeout(() => { btn.textContent = old; }, 1500); };
+
+  const menuAction = async (act, id, btn) => {
+    const m = state.find((x) => x.id === id);
+    if (!m) return;
+    if (act === 'reply') {
+      replyTo = m; editing = null; closeMenus(); setCtx(); $form.text.focus();
+    } else if (act === 'copy') {
+      flash(btn, (await copyText(m.text)) ? 'Kopiert ✓' : 'Nicht möglich');
+    } else if (act === 'edit') {
+      editing = m; replyTo = null; closeMenus(); setCtx();
+      $form.text.value = m.text; $form.text.focus();
+    } else if (act === 'delete') {
+      if (!confirm('Diese Nachricht für alle löschen?')) return;
+      try { redraw(await api.deleteMessage(token, id)); } catch (e) {
+        alert('Die Nachricht konnte nicht gelöscht werden. Talk erlaubt das nur für kurze Zeit nach dem Senden.');
+      }
+    } else if (act === 'remind') {
+      const menu = btn.closest('.msgmenu');
+      menu.innerHTML = [['hour', 'In 1 Stunde'], ['evening', 'Heute Abend (18 Uhr)'], ['morning', 'Morgen früh (8 Uhr)'], ['week', 'Nächste Woche (Montag 8 Uhr)']]
+        .map(([k, l]) => `<button type="button" data-id="${id}" data-remind="${k}">${l}</button>`).join('');
+    }
+  };
+  const canChange = (m) => m.me && m.id !== undefined && m.plain !== false && Date.now() - m.t.getTime() < 6 * 3600e3;
 
   // Emoji-Reaktionen: Chip antippen = selbst reagieren oder zurücknehmen, „＋☺“ = Auswahl öffnen
   const toggleReaction = async (id, emoji) => {
@@ -1022,15 +1096,40 @@ async function viewChat(token) {
       try { redraw((await api.chat(token)).messages); } catch {}
     }
   };
-  $msgs.addEventListener('click', (ev) => {
+  $msgs.addEventListener('click', async (ev) => {
     const b = ev.target.closest('button[data-id]');
     if (!b) return;
     const id = Number(b.dataset.id);
+    if (b.dataset.remind) {
+      const when = remindAt(b.dataset.remind);
+      try {
+        await api.remind(token, id, Math.floor(when.getTime() / 1000));
+        flash(b, 'Gemerkt ✓');
+        setTimeout(closeMenus, 900);
+      } catch (e) { alert('Die Erinnerung konnte nicht gespeichert werden.'); }
+      return;
+    }
+    if (b.dataset.act === 'more') {
+      const msg = b.closest('.msg');
+      const open = msg.querySelector('.msgmenu');
+      closeMenus();
+      $msgs.querySelectorAll('.picker').forEach((p) => p.remove());
+      if (open) return;
+      const m = state.find((x) => x.id === id);
+      const menu = document.createElement('div');
+      menu.className = 'msgmenu';
+      menu.innerHTML = [['reply', 'Antworten'], ['copy', 'Kopieren'], ...(canChange(m) ? [['edit', 'Bearbeiten'], ['delete', 'Löschen']] : []), ['remind', 'Erinnerung …']]
+        .map(([a, l]) => `<button type="button" data-id="${id}" data-act="${a}">${l}</button>`).join('');
+      msg.querySelector('.time').after(menu);
+      return;
+    }
+    if (b.dataset.act) return menuAction(b.dataset.act, id, b);
     if (b.dataset.emoji) return toggleReaction(id, b.dataset.emoji);
     // „＋☺“: Auswahl unter der Nachricht ein- oder ausblenden
     const msg = b.closest('.msg');
     const open = msg.querySelector('.picker');
     $msgs.querySelectorAll('.picker').forEach((p) => p.remove());
+    closeMenus();
     if (open) return;
     const picker = document.createElement('div');
     picker.className = 'picker';
@@ -1040,7 +1139,7 @@ async function viewChat(token) {
 
   if (!api.demo) {
     refreshTimer = setInterval(async () => {
-      if (document.hidden || $msgs.querySelector('.picker')) return;
+      if (document.hidden || $msgs.querySelector('.picker, .msgmenu')) return;
       try { redraw((await api.chat(token)).messages); } catch (e) { /* nächster Versuch */ }
     }, 10000);
   }
@@ -1063,9 +1162,10 @@ function messagesHtml(msgs) {
     lastDay = dayLabel;
     return `${sep}<div class="msg${m.me ? ' me' : ''}">
       ${m.me ? '' : `<div class="who">${esc(m.who)}</div>`}
+      ${m.reply ? `<div class="quote"><b>${esc(m.reply.who)}</b> ${m.reply.deleted ? '<i>Nachricht gelöscht</i>' : esc(stripMd(m.reply.text).slice(0, 90))}</div>` : ''}
       <div class="body">${/[#*`|]|^\s*[-*]\s/m.test(m.text) ? markdown(m.text) : linkify(esc(m.text)).replace(/\n/g, '<br>')}</div>
       ${reactionsHtml(m)}
-      <div class="time">${fmtTime(m.t)}</div>
+      <div class="time">${m.edited ? 'bearbeitet · ' : ''}${fmtTime(m.t)}${m.id === undefined ? '' : ` <button type="button" class="more" data-id="${m.id}" data-act="more" aria-label="Mehr zu dieser Nachricht">⋯</button>`}</div>
     </div>`;
   }).join('');
 }

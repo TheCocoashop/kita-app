@@ -171,6 +171,21 @@ a.card, button.card { display: block; width: 100%; text-align: left; color: inhe
 }
 .btn.secondary { background: var(--green-soft); color: var(--green); }
 .chat-pad { height: 64px; }
+.chat-pad.tall { height: 104px; }
+.composer { flex-wrap: wrap; }
+.composer .ctx { flex: 0 0 100%; min-width: 0; overflow: hidden; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--soft); }
+.composer .ctx[hidden] { display: none; }
+.ctx-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ctx-x { background: transparent !important; color: var(--soft) !important; padding: 2px 8px !important; font-size: 16px; }
+.msg .quote { margin: 4px 0; padding: 4px 8px; border-left: 3px solid var(--green); border-radius: 4px; background: var(--bg); color: var(--soft); font-size: 13px; line-height: 1.3; }
+.msg.me .quote { background: rgba(255,255,255,.18); border-left-color: #fff; color: rgba(255,255,255,.9); }
+.msg .more { font: inherit; font-size: 18px; line-height: 1; padding: 0 6px; border: 0; background: transparent; color: var(--soft); cursor: pointer; vertical-align: middle; }
+.msg.me .more { color: rgba(255,255,255,.85); }
+.msgmenu { display: flex; flex-direction: column; margin-top: 6px; border-radius: 12px; overflow: hidden; background: var(--bg); border: 1px solid var(--rule); }
+.msgmenu button { font: inherit; font-size: 15px; text-align: left; padding: 11px 14px; border: 0; border-top: 1px solid var(--rule); background: transparent; color: var(--ink); cursor: pointer; }
+.msgmenu button:first-child { border-top: 0; }
+.msgmenu button:active { background: var(--green-soft); }
+.msgmenu button[data-act=delete] { color: #b3261e; }
 
 /* Fotos */
 .lightbox {

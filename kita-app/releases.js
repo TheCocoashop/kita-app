@@ -3,6 +3,13 @@
 // nextcloud/kitaapp/appinfo/info.xml angleichen.
 const RELEASES = [
   {
+    version: '1.9.0', date: '2026-11-23',
+    notes: [
+      'Chat: Unter jeder Nachricht gibt es jetzt „⋯“. Dort kannst du antworten (die Antwort zeigt ein Zitat), die Nachricht kopieren und dich an sie erinnern lassen (in 1 Stunde, heute Abend, morgen früh oder nächste Woche).',
+      'Chat: Eigene Nachrichten kannst du kurz nach dem Senden bearbeiten oder löschen. Das erlaubt Talk nur für wenige Stunden.',
+    ],
+  },
+  {
     version: '1.8.0', date: '2026-11-21',
     notes: [
       'Umfragen: Unter jeder Antwort steht jetzt „Wer? (3)“. Ein Tipp darauf zeigt die Namen derer, die so abgestimmt haben. So sieht auch die Person, die die Umfrage angelegt hat, wer geantwortet hat.',

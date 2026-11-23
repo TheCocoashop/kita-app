@@ -64,11 +64,25 @@ function demoApi(D) {
     monthEvents: () => wait(D.events),
     chats: () => wait(D.chats.map(summary)),
     chat: (token) => wait(demoChat(D.chats.find((c) => c.token === token))),
-    sendMessage: (token, text) => {
-      const c = D.chats.find((c) => c.token === token);
-      c.messages.push({ who: D.user.displayName, text, t: new Date(), me: true });
-      return wait(demoChat(c).messages);
+    sendMessage: (token, text, replyTo) => {
+      const c = demoChat(D.chats.find((c) => c.token === token));
+      const q = replyTo && c.messages.find((x) => x.id === replyTo);
+      c.messages.push({ id: c.messages.reduce((n, x) => Math.max(n, x.id), 0) + 1, who: D.user.displayName, text, t: new Date(), me: true, reactions: {}, mine: [], plain: true,
+        reply: q ? { id: q.id, who: q.me ? 'Du' : q.who, text: q.text } : null });
+      return wait(c.messages);
     },
+    editMessage: (token, id, text) => {
+      const c = demoChat(D.chats.find((c) => c.token === token));
+      const m = c.messages.find((x) => x.id === id);
+      if (m) { m.text = text; m.edited = true; }
+      return wait(c.messages);
+    },
+    deleteMessage: (token, id) => {
+      const c = demoChat(D.chats.find((c) => c.token === token));
+      c.messages = c.messages.filter((x) => x.id !== id);
+      return wait(c.messages);
+    },
+    remind: () => wait(),
     react: (token, id, emoji, on) => {
       const c = demoChat(D.chats.find((c) => c.token === token));
       const m = c.messages.find((x) => x.id === id);
@@ -499,6 +513,11 @@ function nextcloudApi(cfg) {
       me: m.actorType === 'users' && m.actorId === cfg.uid,
       reactions: m.reactions || {},
       mine: m.reactionsSelf || [],
+      // Zitat, wenn die Nachricht eine Antwort ist
+      reply: m.parent && m.parent.id ? { id: m.parent.id, who: m.parent.actorDisplayName || 'Gast', text: m.parent.deleted ? '' : talkText(m.parent), deleted: !!m.parent.deleted } : null,
+      edited: !!m.lastEditTimestamp,
+      // Nachrichten mit Erwähnungen oder Dateien lassen sich nicht sicher als Text bearbeiten
+      plain: !m.messageParameters || !Object.keys(m.messageParameters).length,
     };
   }
 
@@ -715,9 +734,23 @@ function nextcloudApi(cfg) {
         messages: msgs.filter((m) => !m.systemMessage && m.messageType !== 'comment_deleted').reverse().map(toMessage),
       };
     },
-    async sendMessage(token, text) {
-      await req(ocs(`/apps/spreed/api/v1/chat/${encodeURIComponent(token)}`), { method: 'POST', body: JSON.stringify({ message: text }) });
+    async sendMessage(token, text, replyTo) {
+      const body = replyTo ? { message: text, replyTo } : { message: text };
+      await req(ocs(`/apps/spreed/api/v1/chat/${encodeURIComponent(token)}`), { method: 'POST', body: JSON.stringify(body) });
       return (await this.chat(token)).messages;
+    },
+    // Eigene Nachricht ändern oder löschen (Talk erlaubt das nur für eine begrenzte Zeit)
+    async editMessage(token, id, text) {
+      await req(ocs(`/apps/spreed/api/v1/chat/${encodeURIComponent(token)}/${id}`), { method: 'PUT', body: JSON.stringify({ message: text }) });
+      return (await this.chat(token)).messages;
+    },
+    async deleteMessage(token, id) {
+      await req(ocs(`/apps/spreed/api/v1/chat/${encodeURIComponent(token)}/${id}`), { method: 'DELETE' });
+      return (await this.chat(token)).messages;
+    },
+    // Erinnerung: Talk schickt zur gewählten Zeit eine Benachrichtigung (timestamp in Sekunden)
+    async remind(token, id, timestamp) {
+      await req(ocs(`/apps/spreed/api/v1/chat/${encodeURIComponent(token)}/${id}/reminder`), { method: 'POST', body: JSON.stringify({ timestamp }) });
     },
     // Emoji-Reaktion setzen (on = true) oder zurücknehmen
     async react(token, id, emoji, on) {
