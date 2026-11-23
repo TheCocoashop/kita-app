@@ -13,6 +13,7 @@ use OCP\Mail\IMessage;
  *
  *   org_name         Voller Name, z. B. „Naturkindergarten Beispiel e.V.“ (Fuß von Mails)
  *   org_short        Kurzname für Absender und App-Namen
+ *   parent_chat_url  Link zum Eltern-Chat (für Hinweis in der Rückblick-Mail)
  *   mail_from        Absenderadresse für Mails der App (leer = Standard-Absender der Nextcloud)
  *   mail_contact     Adresse für Antworten und Rückfragen (leer = keine Antwortadresse)
  *   mail_it          Adresse bei Problemen mit der App, z. B. fehlende Mailadresse (leer = „meldet euch beim Team“)
@@ -45,6 +46,11 @@ class OrgSettings {
 		return $this->get('mail_contact');
 	}
 
+	/** Link zum Eltern-Chat in der App (leer = kein Hinweis auf den Chat in Mails). */
+	public function parentChatUrl(): string {
+		return $this->get('parent_chat_url');
+	}
+
 	public function mailIt(): string {
 		return $this->get('mail_it');
 	}
@@ -53,12 +59,12 @@ class OrgSettings {
 		return rtrim($this->get('photo_host'), '/');
 	}
 
-	/** Absender und Antwortadresse setzen, soweit eingestellt. */
-	public function applySender(IMessage $msg): void {
+	/** Absender und (wenn gewünscht) Antwortadresse setzen, soweit eingestellt. */
+	public function applySender(IMessage $msg, bool $withReplyTo = true): void {
 		if ($this->mailFrom() !== '') {
 			$msg->setFrom([$this->mailFrom() => $this->shortName()]);
 		}
-		if ($this->mailContact() !== '') {
+		if ($withReplyTo && $this->mailContact() !== '') {
 			$msg->setReplyTo([$this->mailContact() => $this->shortName()]);
 		}
 	}

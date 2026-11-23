@@ -3,6 +3,12 @@
 // nextcloud/kitaapp/appinfo/info.xml angleichen.
 const RELEASES = [
   {
+    version: '1.9.1', date: '2026-11-23',
+    notes: [
+      'Im Hintergrund: Die Rückblick-Mail hat keine Antwortadresse mehr. Statt „Antworte einfach auf diese Mail“ führt ein Link in den Eltern-Chat.',
+    ],
+  },
+  {
     version: '1.9.0', date: '2026-11-23',
     notes: [
       'Chat: Unter jeder Nachricht gibt es jetzt „⋯“. Dort kannst du antworten (die Antwort zeigt ein Zitat), die Nachricht kopieren und dich an sie erinnern lassen (in 1 Stunde, heute Abend, morgen früh oder nächste Woche).',

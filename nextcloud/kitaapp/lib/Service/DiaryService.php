@@ -386,7 +386,7 @@ class DiaryService {
 			. "Den ganzen Rückblick lesen:\n" . $url . "\n"
 			. ($link !== '' ? "\nAlle Fotos der Woche:\n" . $link . "\n" : '')
 			. "\n" . $closing . "\n\n" . $sign . "\n\n"
-			. "--\n" . $this->org->name() . "\nFragen? Einfach auf diese Mail antworten.\n";
+			. "--\n" . $this->org->name() . "\n" . $this->questionsText() . "\n";
 
 		$photos = $link !== ''
 			? '<a href="' . $e($link) . '" style="color:#5E6B3C;font-size:15px;text-decoration:underline;">Alle Fotos der Woche ansehen</a>'
@@ -425,11 +425,24 @@ class DiaryService {
 			. $e($closing) . '<br><br><span style="color:#5E6B3C;">' . $e($sign) . '</span></td></tr>'
 			// Fuß
 			. '<tr><td style="padding:34px 40px 30px 40px;"><div style="border-top:1px solid #E4DECB;padding-top:16px;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#8A8F6A;">'
-			. $e($this->org->name()) . '<br>Du bekommst diese Mail, weil du im Eltern-Verteiler stehst. Fragen? Antworte einfach auf diese Mail.'
+			. $e($this->org->name()) . '<br>Du bekommst diese Mail, weil du im Eltern-Verteiler stehst. ' . $this->questionsHtml($e)
 			. '</div></td></tr>'
 			. '</table></td></tr></table></body></html>';
 
 		return [$subject, $html, $text];
+	}
+
+	/** Hinweis am Mail-Ende: Antworten gehen nicht, Fragen laufen über den Eltern-Chat. */
+	private function questionsText(): string {
+		$url = $this->org->parentChatUrl();
+		return $url !== '' ? 'Fragen? Bitte im Eltern-Chat stellen: ' . $url : 'Diese Mail kann nicht beantwortet werden.';
+	}
+
+	private function questionsHtml(callable $e): string {
+		$url = $this->org->parentChatUrl();
+		return $url !== ''
+			? 'Fragen? <a href="' . $e($url) . '" style="color:#5E6B3C;text-decoration:underline;">Bitte im Eltern-Chat stellen</a>.'
+			: 'Diese Mail kann nicht beantwortet werden.';
 	}
 
 	/** Logo für die Mail: img/mail-logo.png der App (gehört nicht ins Repository, jede Einrichtung legt ihr eigenes ab). */
@@ -445,7 +458,7 @@ class DiaryService {
 		[$subject, $html, $text] = $this->buildMail($title, $body, $link, $author, $cover !== null);
 		try {
 			$msg = $this->mailer->createMessage();
-			$this->org->applySender($msg);
+			$this->org->applySender($msg, false);
 			$msg->setTo([$this->mailTo() => 'Eltern']);
 			$msg->setSubject($subject);
 			$msg->setPlainBody($text);
