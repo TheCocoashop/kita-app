@@ -380,10 +380,11 @@ class DiaryService {
 
 		$subject = 'Neues aus dem Wald: ' . $title;
 
+		$inner = $this->mailBody($body);
 		$text = $greeting . "\n\n"
 			. $title . "\n\n"
-			. $teaser . "\n\n"
-			. "Den ganzen Rückblick lesen:\n" . $url . "\n"
+			. $this->mdToText($inner) . "\n\n"
+			. "Im Handbuch ansehen (mit Anmeldung):\n" . $url . "\n"
 			. ($link !== '' ? "\nAlle Fotos der Woche:\n" . $link . "\n" : '')
 			. "\n" . $closing . "\n\n" . $sign . "\n\n"
 			. "--\n" . $this->org->name() . "\n" . $this->questionsText() . "\n";
@@ -411,13 +412,11 @@ class DiaryService {
 			. ($hasCover ? '<tr><td style="padding:28px 0 0 0;"><img src="cid:cover.jpg" width="600" alt="' . $e($title) . '" style="display:block;border:0;width:100%;max-width:600px;height:auto;"></td></tr>' : '')
 			// Anrede
 			. '<tr><td style="padding:28px 40px 0 40px;font-family:Helvetica,Arial,sans-serif;font-size:18px;line-height:1.5;color:#24385B;">' . $e($greeting) . '</td></tr>'
-			// Auszug
-			. '<tr><td style="padding:20px 40px 0 40px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
-			. '<td style="background:#F6F2E8;border-radius:4px;padding:20px 22px;font-family:Georgia,\'Times New Roman\',serif;font-size:17px;line-height:1.6;color:#24385B;font-style:italic;">„' . $e($teaser) . '“</td>'
-			. '</tr></table></td></tr>'
+			// Text des Rückblicks
+			. '<tr><td style="padding:20px 40px 0 40px;font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#24385B;">' . $this->mdToHtml($inner, $e) . '</td></tr>'
 			// Knopf
 			. '<tr><td align="center" style="padding:30px 40px 6px 40px;"><table role="presentation" cellpadding="0" cellspacing="0"><tr>'
-			. '<td align="center" style="background:#C9743A;border-radius:24px;"><a href="' . $e($url) . '" style="display:inline-block;padding:14px 34px;font-family:Helvetica,Arial,sans-serif;font-size:16px;letter-spacing:0.5px;color:#FFFFFF;text-decoration:none;">Den ganzen Rückblick lesen</a></td>'
+			. '<td align="center" style="background:#C9743A;border-radius:24px;"><a href="' . $e($url) . '" style="display:inline-block;padding:14px 34px;font-family:Helvetica,Arial,sans-serif;font-size:16px;letter-spacing:0.5px;color:#FFFFFF;text-decoration:none;">Im Handbuch ansehen</a></td>'
 			. '</tr></table></td></tr>'
 			. ($photos !== '' ? '<tr><td align="center" style="padding:14px 40px 0 40px;font-family:Helvetica,Arial,sans-serif;">' . $photos . '</td></tr>' : '')
 			// Abschluss
@@ -430,6 +429,56 @@ class DiaryService {
 			. '</table></td></tr></table></body></html>';
 
 		return [$subject, $html, $text];
+	}
+
+	/** Text für die Mail: Anrede und Gruß der Vorlage fallen weg (die Mail bringt eigene), Bilder auch. */
+	private function mailBody(string $body): string {
+		$body = preg_replace('/!\[[^\]]*\]\([^)]*\)/u', '', $body);
+		$lines = preg_split('/\R/u', trim($body));
+		while ($lines && preg_match('/^(\s*|Liebe[^\n]*)$/u', $lines[0])) {
+			array_shift($lines);
+		}
+		while ($lines && preg_match('/^(\s*|Gruß[^\n]*|Herzliche Grüße[^\n]*)$/u', end($lines))) {
+			array_pop($lines);
+		}
+		return trim(implode("\n", $lines));
+	}
+
+	/** Markdown als Klartext: Links bleiben als Adresse erhalten. */
+	private function mdToText(string $md): string {
+		// Auszeichnung nur außerhalb von Links entfernen (Adressen enthalten oft _ und *)
+		$parts = preg_split('/(\[[^\]]+\]\(https?:[^)\s]+\))/u', $md, -1, PREG_SPLIT_DELIM_CAPTURE);
+		$out = '';
+		foreach ($parts as $part) {
+			$out .= preg_match('/^\[([^\]]+)\]\((https?:[^)\s]+)\)$/u', $part, $m)
+				? $m[1] . ' (' . $m[2] . ')'
+				: preg_replace('/\*\*|(?<![\w*])\*(?=\S)|(?<=\S)\*(?![\w*])/u', '', $part);
+		}
+		return $out;
+	}
+
+	/** Einfaches Markdown (Absätze, **fett**, *kursiv*, Links, Aufzählungen) als Mail-HTML. */
+	private function mdToHtml(string $md, callable $e): string {
+		$out = [];
+		foreach (preg_split('/\n\s*\n/u', $md) as $para) {
+			$para = trim($para);
+			if ($para === '') {
+				continue;
+			}
+			$html = [];
+			foreach (preg_split('/\R/u', $para) as $line) {
+				$line = trim($line);
+				$bullet = preg_match('/^[-*]\s+(.*)$/u', $line, $m);
+				$line = $bullet ? $m[1] : preg_replace('/^#+\s*/u', '', $line);
+				$h = $e($line);
+				$h = preg_replace_callback('/\[([^\]]+)\]\((https?:[^)\s]+)\)/u', fn ($mm) => '<a href="' . $mm[2] . '" style="color:#5E6B3C;text-decoration:underline;">' . $mm[1] . '</a>', $h);
+				$h = preg_replace('/\*\*(.+?)\*\*/u', '<strong>$1</strong>', $h);
+				$h = preg_replace('/(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])/u', '<em>$1</em>', $h);
+				$html[] = ($bullet ? '&bull; ' : '') . $h;
+			}
+			$out[] = '<p style="margin:0 0 16px 0;">' . implode('<br>', $html) . '</p>';
+		}
+		return implode('', $out);
 	}
 
 	/** Hinweis am Mail-Ende: Antworten gehen nicht, Fragen laufen über den Eltern-Chat. */

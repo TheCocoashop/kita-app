@@ -3,6 +3,12 @@
 // nextcloud/kitaapp/appinfo/info.xml angleichen.
 const RELEASES = [
   {
+    version: '1.9.2', date: '2026-11-23',
+    notes: [
+      'Die Rückblick-Mail enthält jetzt den ganzen Text. Wer die App nicht öffnen mag, kann alles in der Mail lesen. Der Knopf „Im Handbuch ansehen“ bleibt.',
+    ],
+  },
+  {
     version: '1.9.1', date: '2026-11-23',
     notes: [
       'Im Hintergrund: Die Rückblick-Mail hat keine Antwortadresse mehr. Statt „Antworte einfach auf diese Mail“ führt ein Link in den Eltern-Chat.',
