@@ -4,7 +4,7 @@
 # (3) Warteschlange. Alarm per Mail an ALERT_TO (geht über den ausgehenden Brevo-Weg).
 # Zustand: /var/lib/mail-healthcheck/state  |  Test: MAILCHECK_FORCE_ALARM=1 ./mail-healthcheck.sh
 set -u
-ALERT_TO="mbeck7@me.com"
+ALERT_TO="mbeck7@me.com, b.kubitza@gmail.com"   # mehrere Empfänger mit Komma trennen
 CANARY="monitor@naturkindergarten-diessen.de"   # eigenes Testpostfach (Testmails werden wieder gelöscht)
 ALERT_FROM="it@naturkindergarten-diessen.de"
 DOMAIN_RE='naturkindergarten-diessen\.de'
@@ -53,7 +53,7 @@ fi
 now=$(date +%s); last=$(cat "$STATE/last_alert" 2>/dev/null || echo 0)
 send() {  # $1 Betreff, $2 Text
   printf 'Subject: %s\nFrom: %s\nTo: %s\nContent-Type: text/plain; charset=UTF-8\n\n%s\n' "$1" "$ALERT_FROM" "$ALERT_TO" "$2" \
-    | docker exec -i "$P" sendmail -f "$ALERT_FROM" "$ALERT_TO"
+    | docker exec -i "$P" sendmail -f "$ALERT_FROM" $(echo "$ALERT_TO" | tr ',' ' ')
 }
 if [ ${#problems[@]} -gt 0 ]; then
   if [ $((now-last)) -ge $REALERT ] || [ "${MAILCHECK_FORCE_ALARM:-0}" = 1 ]; then
